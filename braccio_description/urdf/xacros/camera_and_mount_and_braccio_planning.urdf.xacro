@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kr5">
+    
+    <xacro:include filename="$(find braccio_description)/urdf/xacros/camera_mount_model.urdf.xacro" />
+
+    <xacro:include filename="$(find braccio_description)/urdf/xacros/_d435.urdf.xacro"/>
+    <xacro:include filename="$(find braccio_description)/urdf/xacros/braccio_model_planning.urdf.xacro"/>
+
+
+    <link name="world"/>
+
+    <xacro:camera_mount parent="world">
+    </xacro:camera_mount>
+
+    <xacro:sensor_d435 parent="mount">
+        <origin xyz="0.0 0.0 0.625" rpy="0.0 1.10 1.10" />
+    </xacro:sensor_d435>
+
+    <xacro:kr5 parent="mount">
+    </xacro:kr5>
+
+
+</robot>
