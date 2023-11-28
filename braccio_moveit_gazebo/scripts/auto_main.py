@@ -280,6 +280,7 @@ def main():
     #HERE WE USE CUSTOM TARGET AND MATRIX MESSAGES
     # List with the target messages
     target_msg_arr = []
+    
     for j in range(len(link_array)):
         #Generating the target message, fields are: nr[int], sherd[str], home[str]
         target_msg = target()
@@ -306,11 +307,17 @@ def main():
     # creating the target_pub publisher, topic is /targets, message type is matrix
     target_pub = rospy.Publisher('/targets', matrix, queue_size=10)
 
-    # Publishing the matrix message with the targets
-    while not rospy.is_shutdown():
-        target_pub.publish(matrix_msg)
-        # rospy.spin()
-        rate.sleep()
+    try:
+        # Publishing the matrix message with the targets
+        while not rospy.is_shutdown():
+            target_pub.publish(matrix_msg)
+            # rospy.spin()
+            rate.sleep()
+
+    except KeyboardInterrupt:
+    # User interrupt the program with ctrl+c
+        print("Got Ctrl-c: closing subscriber and other processes")
+        exit()
         
 
 if __name__ == "__main__":
