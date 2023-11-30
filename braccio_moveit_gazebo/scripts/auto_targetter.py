@@ -86,7 +86,7 @@ class BraccioObjectTargetInterface(object):
       self.linkstate_data = data
       # rospy.loginfo("linkstate_data received") #+ str(self.linkstate_data))
       # print(self.linkstate_data)
-      return(self.linkstate_data)
+      # return(self.linkstate_data)
     except ValueError:
       pass
 
@@ -102,7 +102,7 @@ class BraccioObjectTargetInterface(object):
   def get_box_position(self,lk):
     # x, y, r = self.get_link_position(['unit_box_1::link'])
     # x, y, r = self.get_link_position(self.link_choose)
-    x, y, r = self.get_link_position(lk)
+    x, y, r = self.get_link_position([lk])
     return self.transform(x,y,r)
 
   # def get_link_choose(self, lk):
@@ -119,7 +119,10 @@ class BraccioObjectTargetInterface(object):
     y = 0
     n = 0
     for l in link_names:
-      ind = self.linkstate_data.name.index(link_names)
+      # print(link_names)
+      # ind = self.linkstate_data.name.index(link_names)
+      print(l)
+      ind = self.linkstate_data.name.index(l)
       res = self.linkstate_data.pose[ind].position
       x += res.x
       y += res.y
@@ -130,7 +133,10 @@ class BraccioObjectTargetInterface(object):
     """scan a series of points and record points in gazebo and robot frames"""
     src_pts = []
     dst_angs = []
-    mouseX, mouseY, r_ = self.get_link_position(['kuka::base_link'])
+    # mouseX, mouseY, r_ = self.get_link_position(['kuka::base_link'])
+    links = [['kuka::mount'], ['kuka::left_gripper_link'],['kuka::right_gripper_link']]
+    # mouseX, mouseY, r_ = self.get_link_position(links[0])
+    mouseX, mouseY, r_ = self.get_link_position(['kuka::mount'])
     src_pts.append([mouseX,mouseY])
 
     self.gripper_middle()
@@ -149,6 +155,8 @@ class BraccioObjectTargetInterface(object):
       self.go_to_j(j0=rand_phi,j1=theta_shoulder,j2=theta_elbow,j3=theta_wrist)
       mouseX, mouseY, r_ = self.get_link_position(['kuka::left_gripper_link','kuka::right_gripper_link'])
       src_pts.append([mouseX,mouseY])
+      # mouseX, mouseY, r_ = self.get_link_position('kuka::right_gripper_link')
+      # src_pts.append([mouseX,mouseY])
       dst_angs.append(rand_targ)
     with open('calibration.json', 'w') as f:
       json.dump({'src_pts':src_pts,'dst_angs':dst_angs},f)
@@ -193,6 +201,7 @@ class BraccioObjectTargetInterface(object):
       cv2.destroyAllWindows()
     except:
       print('calibration.json not in current directory, run calibration first')
+      self.calibrate()
 
   def go_to_j(self, j0=None, j1=None, j2=None, j3=None):
     """update arm joints"""

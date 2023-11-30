@@ -10,7 +10,8 @@
             </inertial>
             <visual>
                 <geometry>
-                    <mesh filename="package://braccio_description/stl/camera_mount.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <mesh filename="package://braccio_description/stl/camera_mount.stl" scale="0.001 0.001 0.001"/> -->
+                    <mesh filename="package://braccio_description/stl/assieme.stl" scale="0.001 0.001 0.001"/>
                 </geometry>
                 <material name="white"/>
                 <origin rpy="1.57 0 0.78" xyz="0 0.0 0" />
@@ -18,17 +19,19 @@
 
             <collision>
                 <geometry>
-                    <mesh filename="package://braccio_description/stl/camera_mount.stl" scale="0.001 0.001 0.001"/>
+                    <!-- <mesh filename="package://braccio_description/stl/camera_mount.stl" scale="0.001 0.001 0.001"/> -->
+                    <mesh filename="package://braccio_description/stl/assieme.stl" scale="0.001 0.001 0.001"/>
+
                 </geometry>
                 <origin rpy="1.57 0 0.78" xyz="0 0.0 0" />
             </collision>
         </link>
 
 
-        <joint name="mount_joint" type="continuous" >
+        <joint name="mount_joint" type="fixed" >
             <parent link="${parent}" />
             <child link="mount" />
-            <axis xyz="0 0 -1" />
+            <!-- <axis xyz="0 0 -1" /> -->
         </joint> 
     </xacro:macro>
 

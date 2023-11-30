@@ -13,7 +13,7 @@
     </xacro:camera_mount>
 
     <xacro:sensor_d435 parent="mount">
-        <origin xyz="0.0 0.0 0.625" rpy="0.0 1.10 1.10" />
+        <origin xyz="0.02 0.015 0.604" rpy="-0.02 1.00 1.58" />
     </xacro:sensor_d435>
 
     <xacro:kr5 parent="mount">
