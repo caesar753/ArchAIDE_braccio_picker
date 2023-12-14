@@ -76,7 +76,7 @@ rosrun braccio_moveit_gazebo targetter_subscriber.py
 
 This is a short video to illustrate how the arm works
 
-![GIF video](doc/archaide_picke_16_9.gif)
+![GIF video](doc/archaide_picker_16_9.gif)
 
 ## Learn more
 
