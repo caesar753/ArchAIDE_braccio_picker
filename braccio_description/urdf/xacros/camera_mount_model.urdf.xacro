@@ -17,14 +17,13 @@
                 <origin rpy="1.57 0 0.78" xyz="0 0.0 0" />
             </visual>
 
-            <collision>
-                <geometry>
+            <!-- <collision>
+                <geometry> -->
                     <!-- <mesh filename="package://braccio_description/stl/camera_mount.stl" scale="0.001 0.001 0.001"/> -->
-                    <mesh filename="package://braccio_description/stl/assieme.stl" scale="0.001 0.001 0.001"/>
-
+                    <!-- <mesh filename="package://braccio_description/stl/assieme2.stl" scale="0.001 0.001 0.001"/>
                 </geometry>
                 <origin rpy="1.57 0 0.78" xyz="0 0.0 0" />
-            </collision>
+            </collision> -->
         </link>
 
 

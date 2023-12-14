@@ -130,6 +130,9 @@ class BraccioObjectTargetInterface(object):
     return x/n, y/n, DEFAULT_ROT
 
   def calibrate(self):
+    joint_home = self.move_group.get_current_joint_values()
+    print(f'joint values for home is {joint_home}')
+
     """scan a series of points and record points in gazebo and robot frames"""
     src_pts = []
     dst_angs = []
@@ -162,6 +165,10 @@ class BraccioObjectTargetInterface(object):
       json.dump({'src_pts':src_pts,'dst_angs':dst_angs},f)
     self.load_calibrate()
     self.go_to_up()
+    # self.move_group.go(joint_home, wait=True)
+    # print(f'joint values for home is {joint_home}')
+    self.go_home_position()
+    return
 
   def load_calibrate(self):
     """load mapping points from gazebo to robot frame, estimate l and L, generate homography map"""
@@ -241,6 +248,13 @@ class BraccioObjectTargetInterface(object):
     joint_goal[1] = val
     self.gripper_group.go(joint_goal, wait=True)
     self.gripper_group.stop()
+
+  def go_home_position(self):
+    joint_home = [0.006390002133270123, 0.28485107225109907, 2.815086844862212, 3.0658329095147794, 0.053221123248811786]
+    self.move_group.go(joint_home)
+    self.move_group.stop()
+
+
 
   def go_to_raise(self):
     self.go_to_j(j1=1.15,j2=0.13,j3=2.29)
