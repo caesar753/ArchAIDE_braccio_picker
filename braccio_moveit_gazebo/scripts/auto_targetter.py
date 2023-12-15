@@ -167,7 +167,7 @@ class BraccioObjectTargetInterface(object):
     self.go_to_up()
     # self.move_group.go(joint_home, wait=True)
     # print(f'joint values for home is {joint_home}')
-    self.go_home_position()
+    self.go_start_position()
     return
 
   def load_calibrate(self):
@@ -249,12 +249,10 @@ class BraccioObjectTargetInterface(object):
     self.gripper_group.go(joint_goal, wait=True)
     self.gripper_group.stop()
 
-  def go_home_position(self):
+  def go_start_position(self):
     joint_home = [0.006390002133270123, 0.28485107225109907, 2.815086844862212, 3.0658329095147794, 0.053221123248811786]
     self.move_group.go(joint_home)
     self.move_group.stop()
-
-
 
   def go_to_raise(self):
     self.go_to_j(j1=1.15,j2=0.13,j3=2.29)
