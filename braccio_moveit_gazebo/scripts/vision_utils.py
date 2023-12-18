@@ -104,18 +104,25 @@ def get_arr_from_pose(pose):
     return arr
 
 
-def get_point_cloud_from_ros(debug=False):
+def get_point_cloud_from_ros(debug=False, raggio=0.25):
     point_cloud = rospy.wait_for_message("/camera/depth/color/points", PointCloud2)
     rospy.loginfo("Point got from /camera/depth/color/points")
     pc = []
     for p in pc2.read_points(point_cloud, field_names=("x", "y", "z"), skip_nans=True):
-        if np.linalg.norm(p) > 0.65:
+        if np.linalg.norm(p) > raggio:
             pc.append([p[0], p[1], p[2]])
-
+    
+    
     # Segmentation of Point Cloud
     xyz = np.asarray(pc)
-    #idx = np.where(xyz[:, 2] < 0.8)     # Prune point cloud to 0.8 meters from camera in z direction
-    #xyz = xyz[idx]
+    idx = np.where(xyz[:, 2] > 0.55)     # Prune point cloud to 0.8 meters from camera in z direction
+    xyz = xyz[idx]
+    
+    # idx = np.where(np.logical_and(xyz[:,0] >= 265, xyz[:,0] <= 377))    #np.where(np.logical_and(a>=6, a<=10))
+    # xyz = xyz[idx]
+
+    # idx = np.where(np.logical_and(xyz[:,1] >= 583, xyz[:,1] <= 674))    #np.where(np.logical_and(a>=6, a<=10))
+    # xyz = xyz[idx]
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(xyz)
@@ -125,7 +132,7 @@ def get_point_cloud_from_ros(debug=False):
     if debug:
         o3d.visualization.draw_geometries([pcd])
 
-    return pcd
+    return point_cloud, pcd
 
 def get_point_cloud_from_real_rs(debug=False):
     # Segmentation of Point Cloud

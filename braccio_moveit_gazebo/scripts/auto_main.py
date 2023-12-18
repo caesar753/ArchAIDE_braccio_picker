@@ -43,6 +43,8 @@ from gazebo_msgs.srv import SpawnModel
 
 import time
 
+
+
 # auto_targetter = auto_targetter.BraccioObjectTargetInterface()
 
 # auto_targetter.load_calibrate()
@@ -103,8 +105,8 @@ def main():
         #Store extreme coordinates of the box
         x_min, y_min = np.amin(box[:,0]), np.amin(box[:,1])
         x_max, y_max = np.amax(box[:,0]), np.amax(box[:,1])
-        # print(f'x_min is {x_min}, x_max is {x_max}')
-        # print(f'y_min is {y_min}, y_max is {y_max}')
+        print(f'x_min is {x_min}, x_max is {x_max}')
+        print(f'y_min is {y_min}, y_max is {y_max}')
 
         box = perspective.order_points(box)
 
@@ -116,7 +118,10 @@ def main():
         (trX, trY) = tr
         (brX, brY) = br
         (blX, blY) = bl
-        # print((tl, tr, br, bl))
+        print(f'Top left is {(tlX, tlY)},\
+            Top right is {(trX,trY)},\
+            Bottom right is {(brX,brY)},\
+            Bottom left is {(blX,blY)})')
         (tltrX, tltrY) = segmentation.midpoint(tl, tr)
         (blbrX, blbrY) = segmentation.midpoint(bl, br)
         # compute the midpoint between the top-left and top-right points,
@@ -277,6 +282,7 @@ def main():
     #     o3d.visualization.draw_geometries([table_cloud, object_cloud])
     ###POINTCLOUD SEGMENTATION - END ###
 
+    
     #HERE WE USE CUSTOM TARGET AND MATRIX MESSAGES
     # List with the target messages
     target_msg_arr = []
