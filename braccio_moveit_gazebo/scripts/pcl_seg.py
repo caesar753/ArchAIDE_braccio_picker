@@ -53,7 +53,9 @@ if __name__ == '__main__':
     cuboid_points = getCuboidPoints(start_position)
 
     points = o3d.utility.Vector3dVector(cuboid_points)
-    oriented_bounding_box = o3d.geometry.OrientedBoundingBox.create_from_points(points)
+    # oriented_bounding_box = o3d.geometry.OrientedBoundingBox.create_from_points(points)
+    oriented_bounding_box = o3d.geometry.OrientedBoundingBox(center=[0.0, 0.0, 0.65], extent=[0.10, 0.10, 0.05],
+                                         R=[[1, 0, 0], [0, np.pi/3, 0], [0, 0, 1]])
     point_cloud_crop = pcd.crop(oriented_bounding_box)
 
     # View original point cloud with the cuboid, all 5 points present
