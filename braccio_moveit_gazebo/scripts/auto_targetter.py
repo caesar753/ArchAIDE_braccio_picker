@@ -103,6 +103,7 @@ class BraccioObjectTargetInterface(object):
     # x, y, r = self.get_link_position(['unit_box_1::link'])
     # x, y, r = self.get_link_position(self.link_choose)
     x, y, r = self.get_link_position([lk])
+    print(f"Position of link is {x,y,r}")
     return self.transform(x,y,r)
 
   # def get_link_choose(self, lk):

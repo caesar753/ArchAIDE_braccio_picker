@@ -112,12 +112,16 @@ def get_point_cloud_from_ros(debug=False, raggio=0.25):
         if np.linalg.norm(p) > raggio:
             pc.append([p[0], p[1], p[2]])
     
-    
+    # print(f'pc is {pc}')
     # Segmentation of Point Cloud
     xyz = np.asarray(pc)
+    # xyz = xyz[265:377,583:674]
+    print(f'xyz is {xyz.shape}')
     idx = np.where(xyz[:, 2] > 0.55)     # Prune point cloud to 0.8 meters from camera in z direction
     xyz = xyz[idx]
+    print(f'xyz is {xyz.shape}')
     
+
     # idx = np.where(np.logical_and(xyz[:,0] >= 265, xyz[:,0] <= 377))    #np.where(np.logical_and(a>=6, a<=10))
     # xyz = xyz[idx]
 
@@ -127,12 +131,15 @@ def get_point_cloud_from_ros(debug=False, raggio=0.25):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(xyz)
     print ('Received point cloud')
+    # min_bound = np.array([0.234,0.123,0.0])
+    # max_bound = np.array([0.456,0.345, 0.55])
+    # pcd = o3d.geometry.PointCloud.crop(pcd, min_bound, max_bound)
 
 
     if debug:
         o3d.visualization.draw_geometries([pcd])
 
-    return point_cloud, pcd
+    return pcd
 
 def get_point_cloud_from_real_rs(debug=False):
     # Segmentation of Point Cloud
@@ -215,9 +222,7 @@ def get_point_cloud_from_real_rs(debug=False):
     return pcd
 
 def segment_table(pcd):
-    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005,
-                                             ransac_n=5,
-                                             num_iterations=1000)
+    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005, ransac_n=5, num_iterations=1000)
     [a, b, c, d] = plane_model
 
     # Partial Point Cloud
