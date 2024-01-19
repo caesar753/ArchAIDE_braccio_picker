@@ -222,12 +222,13 @@ def get_point_cloud_from_real_rs(debug=False):
     return pcd
 
 def segment_table(pcd):
-    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005, ransac_n=5, num_iterations=1000)
+    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005, ransac_n=5, num_iterations=100)
     [a, b, c, d] = plane_model
 
     # Partial Point Cloud
     inlier_cloud = pcd.select_by_index(inliers)
     outlier_cloud = pcd.select_by_index(inliers, invert=True)
+    # print(outlier_cloud)
 
     return inlier_cloud, outlier_cloud
 
