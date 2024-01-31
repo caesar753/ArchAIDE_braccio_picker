@@ -4,7 +4,7 @@ import vision_utils
 import rospy
 from sensor_msgs.msg import PointCloud2
 import open3d as o3d
-import auto_targetter
+# import auto_targetter
 import numpy as np
 
 

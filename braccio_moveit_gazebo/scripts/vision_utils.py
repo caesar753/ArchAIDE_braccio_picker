@@ -117,8 +117,10 @@ def get_point_cloud_from_ros(debug=False, raggio=0.25):
     xyz = np.asarray(pc)
     # xyz = xyz[265:377,583:674]
     print(f'xyz is {xyz.shape}')
-    idx = np.where(xyz[:, 2] > 0.55)     # Prune point cloud to 0.8 meters from camera in z direction
-    xyz = xyz[idx]
+    # idx = np.where(xyz[:, 2] > 0.55)     # Prune point cloud to 0.8 meters from camera in z direction
+    # xyz = xyz[idx]
+    idx = np.where(xyz[:, 2] > 0.59)     # Prune point cloud to 0.8 meters from camera in z direction
+    xyz = xyz[idx] 
     print(f'xyz is {xyz.shape}')
     
 
