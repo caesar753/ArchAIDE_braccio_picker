@@ -74,6 +74,7 @@ if __name__ == '__main__':
         # Publishing the PointCloud2 message 
         while not rospy.is_shutdown():
             pointcloud_pub.publish(pc2_o3d)
+            # rospy.loginfo("Publishing object PointCloud2 message on /pcl_obj")
             # rospy.spin()
             rate.sleep()
     

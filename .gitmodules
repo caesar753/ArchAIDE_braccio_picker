@@ -7,4 +7,4 @@
 	url = git@github.com:pal-robotics/realsense_gazebo_plugin.git
 [submodule "gpd_ros"]
 	path = gpd_ros
-	url = git@github.com:atenpas/gpd_ros.git
+	url = git@github.com:caesar753/gpd_archaide.git
