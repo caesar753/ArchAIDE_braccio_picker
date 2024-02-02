@@ -14,6 +14,9 @@ from scipy.spatial.transform import Rotation as R
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped, Pose
 
+import pyrealsense2 as rs
+import matplotlib.pyplot as plt
+
 
 def get_transform(parent_frame='base_link', child_frame='camera_depth_frame'):
     tfBuffer = tf2_ros.Buffer()
@@ -224,7 +227,7 @@ def get_point_cloud_from_real_rs(debug=False):
     return pcd
 
 def segment_table(pcd):
-    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005, ransac_n=5, num_iterations=100)
+    plane_model, inliers = pcd.segment_plane(distance_threshold=0.005, ransac_n=5, num_iterations=1000)
     [a, b, c, d] = plane_model
 
     # Partial Point Cloud
@@ -256,3 +259,107 @@ def get_pose_from_transform(T):
     quat = pyrot.quaternion_xyzw_from_wxyz(pyrot.quaternion_from_matrix(T[:3, :3]))
     pos = T[:3, 3]
     return np.concatenate((pos, quat))
+
+
+##202401,  new vision_utils defs
+
+def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
+
+    print('Starting Point Cloud Processing')
+    # if use_pyrealsense:
+    #     pcd = get_point_cloud_from_real_rs(debug)
+    # else:
+    #     pcd = get_point_cloud_from_ros(debug)
+    if pcd:
+        pass
+    else:
+        pcd = get_point_cloud_from_ros(debug)
+
+    
+    # == Transform pointcloud to table frame
+    # tf_camera_to_world = get_transform(parent_frame="working_surface_link", child_frame="camera_depth_optical_frame")
+    # tran = np.array([tf_camera_to_world.transform.translation.x, tf_camera_to_world.transform.translation.y, tf_camera_to_world.transform.translation.z])
+    # rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_camera_to_world.transform.rotation.w,
+    #                                                                 tf_camera_to_world.transform.rotation.x,
+    #                                                                 tf_camera_to_world.transform.rotation.y,
+    #                                                                 tf_camera_to_world.transform.rotation.z]))
+    
+    # pcd.rotate(rot, center=(0, 0, 0)).translate(tran)
+    #o3d.visualization.draw_geometries([pcd], window_name="PCD Transformed table")
+
+    # == Remove points above a certain height
+    points = np.asarray(pcd.points)
+    pcd = pcd.select_by_index(np.where(points[:, 2] > 0.55)[0])
+    #o3d.visualization.draw_geometries([pcd], window_name="PCD Filtered")
+
+    # == Transform back to camera frame
+    # tf_world_to_camera = get_transform(parent_frame="camera_depth_optical_frame", child_frame="working_surface_link")
+    # tran = np.array([tf_world_to_camera.transform.translation.x, tf_world_to_camera.transform.translation.y, tf_world_to_camera.transform.translation.z])
+    # rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_world_to_camera.transform.rotation.w,
+    #                                                                 tf_world_to_camera.transform.rotation.x,
+    #                                                                 tf_world_to_camera.transform.rotation.y,
+    #                                                                 tf_world_to_camera.transform.rotation.z]))
+    # pcd.rotate(rot, center=(0, 0, 0)).translate(tran)   
+
+    #rospy.init_node('listener', anonymous=True)
+    print ('Detecting Number of Sherds')
+
+    table_cloud, object_cloud = segment_table(pcd)
+
+    voxel_pc = object_cloud.voxel_down_sample(voxel_size=0.001)
+
+    object_cloud, ind = voxel_pc.remove_radius_outlier(nb_points=40, radius=0.03)
+
+    labels = np.array(object_cloud.cluster_dbscan(eps=0.02, min_points=10, print_progress=True))
+    print(f"labels shape is {labels.shape}")
+
+    # object1 = np.asarray(object_cloud.points)[labels[:] == 0]
+    # print(object1.shape)
+    # object1_lab = labels[labels[:] == 1]
+    # print(object1_lab.shape)
+    
+
+    objects_pcl = []
+    labels_size = np.size(np.asarray(labels))
+    if labels_size == 0:
+        n_objects = 0
+    else:
+        max_label = labels.max()
+        print(f"point cloud has {max_label + 1} clusters")
+        colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
+        colors = np.zeros((labels.shape[0], 3))
+        colors[:, 0] = 1.
+        colors[labels < 0] = 0
+
+        n_objects = 0
+        for label in np.unique(labels):
+            print(label)
+            idxs = (labels == label)
+            print(idxs)
+            print(idxs.shape)
+            if labels[idxs].shape[0] > 200:
+                colors[idxs, 0] = 0
+                colors[idxs, 1] = 1.
+                out_pc = o3d.geometry.PointCloud()
+                out_pc.points = o3d.utility.Vector3dVector(np.asarray(object_cloud.points)[labels[:] == label])
+                objects_pcl.append(out_pc)
+                o3d.visualization.draw_geometries([out_pc])
+                n_objects += 1
+
+    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.45])
+
+    # for i in np.unique(labels):
+    #     out_pc = o3d.geometry.PointCloud()
+    #     out_pc.points = o3d.utility.Vector3dVector(np.asarray(object_cloud.points)[labels[:] == i])
+    #     objects_pcl.append(out_pc)
+    #     o3d.visualization.draw_geometries([out_pc])
+
+    # for j in range(len(objects_pcl)):
+    #     o3d.visualization.draw_geometries([objects_pcl[j]])
+
+    if debug:
+        o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, object_cloud])
+        o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud])
+        # o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud, bbox_object])
+   
+    return n_objects, pcd, table_cloud, object_cloud, objects_pcl

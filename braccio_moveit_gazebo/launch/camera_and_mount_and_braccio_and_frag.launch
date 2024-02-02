@@ -51,7 +51,11 @@
 
   <arg name="fragment_model" default="$(find braccio_moveit_gazebo)/scripts/models/model_1.sdf"/>
   <node name="fragment_description" pkg="gazebo_ros" type="spawn_model" 
-  args="-file $(arg fragment_model) -sdf -model frag3 -x 0.15 -y 0.15 -z 0.25" />
+  args="-file $(arg fragment_model) -sdf -model frag1 -x 0.15 -y 0.15 -z 0.25" />
+
+  <arg name="fragment_model2" default="$(find braccio_moveit_gazebo)/scripts/models/model_2.sdf"/>
+  <node name="fragment_description2" pkg="gazebo_ros" type="spawn_model" 
+  args="-file $(arg fragment_model) -sdf -model frag2 -x 0.05 -y 0.25 -z 0.25" />
 
 
 </launch>
