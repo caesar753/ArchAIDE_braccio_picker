@@ -52,12 +52,23 @@ def sherd_poses(objects):
         sherd_nr += 1
     return sherd_msg, bbox_poses
 
+def sherd_pcl(objects):
+    ros_pcl = []
+    for index, element in enumerate(objects):
+        print(index)
+        pc2_o3d = orh.o3dpc_to_rospc(element,("pcl_frag_" + str(index)), stamp, seq_nr = index)
+        ros_pcl.append(pc2_o3d)
+    return ros_pcl
+
 
 if __name__ == '__main__':
 
     # targetter = auto_targetter.BraccioObjectTargetInterface()
 
     rospy.init_node('pcl_vis', anonymous=True)
+    stamp = rospy.Time.now()
+    rate = rospy.Rate(10)
+    
     point_cloud = rospy.wait_for_message("/camera/depth/color/points", PointCloud2)
 
     print("starting pointcloud segmentation")
@@ -76,6 +87,7 @@ if __name__ == '__main__':
     # table_cloud.paint_uniform_color([0, 0, 1])
     
     sherd_msg, bbox_poses = sherd_poses(objects_pcl)
+    sherd_pcl_list = sherd_pcl(objects_pcl)
 
     mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.45])
     
@@ -86,44 +98,25 @@ if __name__ == '__main__':
         o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, objects_pcl[0], bbox_objects[0], objects_pcl[1], bbox_objects[1]])
     
     # targetter.get_box_position("sherd_2::link")
-        
-    # pointcloud_msg = PointCloud2()
-    # pointcloud_msg.header = Header()
-    # pointcloud_msg.header.frame_id = "frame"
 
-    # pointcloud_msg.fields = object_cloud.fields
-    # object_cloud.header.f
-
-    stamp = rospy.Time.now()
-    print(stamp.secs)
-    print(stamp.nsecs)
-    ros_pcl = []
-    for index, element in enumerate(objects_pcl):
-        print(index)
-        pc2_o3d = orh.o3dpc_to_rospc(element,("pcl_frag_" + str(index)), stamp, seq_nr = index)
-        # print(pc2_o3d)
-        ros_pcl.append(pc2_o3d)
-
-
-    rate = rospy.Rate(10)
-     # creating the pointcloud_pub publisher, topic is /pcl_obj, message type is PointCloud2
+    # creating the pointcloud_pub publisher, topic is /pcl_obj, message type is PointCloud2
     # pointcloud_pub = rospy.Publisher('/pcl_obj', PointCloud2, queue_size=10)
 
     #Creating a custom SherdList msg
-    sherd_list = SherdPose()
+    sherd_pose_list = SherdPose()
     #filling
-    sherd_list.SherdList = bbox_poses
+    sherd_pose_list.SherdList = bbox_poses
     #creating the publisher
     SherdPose_pub = rospy.Publisher('/SherdPoses', SherdPose, queue_size=10)
     
 
-    for i in range(len(ros_pcl)):
-        print(f"seq of ros_pcl is {ros_pcl[i].header.seq}")
+    for i in range(len(sherd_pcl_list)):
+        print(f"seq of ros_pcl is {sherd_pcl_list[i].header.seq}")
 
-    #Creating a custom SherdPclList msg which contains the PointCloud2 messages from ros_pcl
-    sherds_list_msg = SherdPclList()
-    sherds_list_msg.list = ros_pcl
-    SherdPcl_pub = rospy.Publisher('/SherdList', SherdPclList, queue_size = 10)
+    #Creating a custom SherdPclList msg which contains the list PointCloud2 messages from  sherd_pcl_list
+    sherds_pcl_msg = SherdPclList()
+    sherds_pcl_msg.list = sherd_pcl_list
+    SherdPcl_pub = rospy.Publisher('/SherdPcls', SherdPclList, queue_size = 10)
 
 
     try:
@@ -131,8 +124,8 @@ if __name__ == '__main__':
         while not rospy.is_shutdown():
             # pointcloud_pub.publish(pc2_o3d)
             
-            # SherdPose_pub.publish(sherd_list)
-            SherdPcl_pub.publish(sherds_list_msg)
+            SherdPose_pub.publish(sherd_pose_list)
+            SherdPcl_pub.publish(sherds_pcl_msg)
             
             # rospy.loginfo("Publishing object PointCloud2 message on /pcl_obj")
             # rospy.spin()
