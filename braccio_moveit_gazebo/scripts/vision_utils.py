@@ -277,20 +277,20 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
 
     
     # == Transform pointcloud to table frame
-    # tf_camera_to_world = get_transform(parent_frame="working_surface_link", child_frame="camera_depth_optical_frame")
-    # tran = np.array([tf_camera_to_world.transform.translation.x, tf_camera_to_world.transform.translation.y, tf_camera_to_world.transform.translation.z])
-    # rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_camera_to_world.transform.rotation.w,
-    #                                                                 tf_camera_to_world.transform.rotation.x,
-    #                                                                 tf_camera_to_world.transform.rotation.y,
-    #                                                                 tf_camera_to_world.transform.rotation.z]))
+    tf_camera_to_mount = get_transform(parent_frame="mount", child_frame="camera_depth_optical_frame")
+    tran = np.array([tf_camera_to_mount.transform.translation.x, tf_camera_to_mount.transform.translation.y, tf_camera_to_mount.transform.translation.z])
+    rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_camera_to_mount.transform.rotation.w,
+                                                                    tf_camera_to_mount.transform.rotation.x,
+                                                                    tf_camera_to_mount.transform.rotation.y,
+                                                                    tf_camera_to_mount.transform.rotation.z]))
     
-    # pcd.rotate(rot, center=(0, 0, 0)).translate(tran)
-    #o3d.visualization.draw_geometries([pcd], window_name="PCD Transformed table")
+    pcd.rotate(rot, center=(0, 0, 0)).translate(tran)
+    o3d.visualization.draw_geometries([pcd], window_name="PCD Transformed table")
 
     # == Remove points above a certain height
     points = np.asarray(pcd.points)
-    pcd = pcd.select_by_index(np.where(points[:, 2] > 0.55)[0])
-    #o3d.visualization.draw_geometries([pcd], window_name="PCD Filtered")
+    # pcd = pcd.select_by_index(np.where(points[:, 2] > 0.05)[0])
+    o3d.visualization.draw_geometries([pcd], window_name="PCD Filtered")
 
     # == Transform back to camera frame
     # tf_world_to_camera = get_transform(parent_frame="camera_depth_optical_frame", child_frame="working_surface_link")
@@ -346,7 +346,7 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
                 o3d.visualization.draw_geometries([out_pc])
                 n_objects += 1
 
-    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.45])
+    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.0])
 
     # for i in np.unique(labels):
     #     out_pc = o3d.geometry.PointCloud()

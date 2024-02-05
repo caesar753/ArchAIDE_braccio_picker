@@ -50,7 +50,7 @@ def sherd_poses(objects):
         sherd_msg.pose.orientation.w = bbox_quat[0,3]
         bbox_poses.append(sherd_msg)
         sherd_nr += 1
-    return sherd_msg, bbox_poses
+    return bbox_objects, sherd_msg, bbox_poses
 
 def sherd_pcl(objects):
     ros_pcl = []
@@ -68,14 +68,14 @@ if __name__ == '__main__':
     rospy.init_node('pcl_vis', anonymous=True)
     stamp = rospy.Time.now()
     rate = rospy.Rate(10)
-    
+
     point_cloud = rospy.wait_for_message("/camera/depth/color/points", PointCloud2)
 
     print("starting pointcloud segmentation")
 
     pcd = vision_utils.get_point_cloud_from_ros()
 
-    debug = False
+    debug = True
 
     num_frescos, pcd, table_cloud, object_cloud, objects_pcl = vision_utils.get_number_of_sherds(pcd, debug)#, use_pyrealsense)
     print (f'Number of frescos detected: {num_frescos}')
@@ -86,13 +86,13 @@ if __name__ == '__main__':
     # object_cloud.paint_uniform_color([1, 0, 0])
     # table_cloud.paint_uniform_color([0, 0, 1])
     
-    sherd_msg, bbox_poses = sherd_poses(objects_pcl)
-    sherd_pcl_list = sherd_pcl(objects_pcl)
+    bbox_objects, sherd_msg, bbox_poses = sherd_poses(objects_pcl, stamp)
+    sherd_pcl_list = sherd_pcl(objects_pcl, stamp)
 
-    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.45])
+    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.00])
     
     if debug:
-        o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, object_cloud, bbox_object])
+        # o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, object_cloud, bbox_object])
         o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud])
         # o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud], bbox_object])
         o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, objects_pcl[0], bbox_objects[0], objects_pcl[1], bbox_objects[1]])
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
 
     try:
-        # Publishing the PointCloud2 message 
+        # Publishing the messages
         while not rospy.is_shutdown():
             # pointcloud_pub.publish(pc2_o3d)
             

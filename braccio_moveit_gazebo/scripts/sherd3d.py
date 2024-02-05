@@ -16,7 +16,7 @@ from scipy.spatial.transform import Rotation as R
 from custom_msgs.msg import SherdPose, SherdPcl, SherdPclList
 
 
-def sherd_poses(objects):
+def sherd_poses(objects, stamp):
     bbox_objects = []
     bbox_poses = []
     sherd_nr = 0
@@ -36,7 +36,7 @@ def sherd_poses(objects):
         #Creating the PoseStamped sherd_msg
         sherd_msg = PoseStamped()
         #Filling the message
-        sherd_stamp = rospy.Time.now()
+        sherd_stamp = stamp
         sherd_msg.header.seq = sherd_nr
         sherd_msg.header.frame_id = ("sherd_" + str(sherd_nr))
         sherd_msg.header.stamp.secs = sherd_stamp.secs
@@ -52,7 +52,7 @@ def sherd_poses(objects):
         sherd_nr += 1
     return sherd_msg, bbox_poses
 
-def sherd_pcl(objects):
+def sherd_pcl(objects, stamp):
     ros_pcl = []
     for index, element in enumerate(objects):
         print(index)
