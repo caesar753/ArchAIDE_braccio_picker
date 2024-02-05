@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -52,6 +54,9 @@ add_message_files(
   FILES
   target.msg
   matrix.msg
+  SherdPose.msg
+  SherdPcl.msg
+  SherdPclList.msg
   # Message1.msg
   # Message2.msg
 )
@@ -74,6 +79,8 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
+  sensor_msgs
 )
 
 ################################################
@@ -108,7 +115,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES custom_msgs
- CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+ CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 
