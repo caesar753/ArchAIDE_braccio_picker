@@ -179,6 +179,7 @@
                 </collision>
             </link>
 
+
             <joint name="base_joint" type="revolute">
                 <axis xyz="0 0 -1" />
                 <limit effort="1.0" lower="0.0" upper="3.1416" velocity="1.0" />
@@ -334,6 +335,15 @@
             <child link="base_link" />
             <axis xyz="0 0 -1" />
         </joint> 
+
+        <!-- Fake joint and link for grasping -->
+	  	<joint name="braccio_grasp_joint" type="fixed">
+			<origin rpy="0 0 1.57" xyz="-0.06 0.03 0.16"/>
+			<parent link="left_gripper_link" />
+			<child link="gripper_grasp_link" />
+		</joint>
+
+		<link name="gripper_grasp_link"/>
      </xacro:macro>
 
 

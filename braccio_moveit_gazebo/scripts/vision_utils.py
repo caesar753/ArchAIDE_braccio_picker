@@ -293,12 +293,12 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
     o3d.visualization.draw_geometries([pcd], window_name="PCD Filtered")
 
     # == Transform back to camera frame
-    # tf_world_to_camera = get_transform(parent_frame="camera_depth_optical_frame", child_frame="working_surface_link")
-    # tran = np.array([tf_world_to_camera.transform.translation.x, tf_world_to_camera.transform.translation.y, tf_world_to_camera.transform.translation.z])
-    # rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_world_to_camera.transform.rotation.w,
-    #                                                                 tf_world_to_camera.transform.rotation.x,
-    #                                                                 tf_world_to_camera.transform.rotation.y,
-    #                                                                 tf_world_to_camera.transform.rotation.z]))
+    # tf_mount_to_camera = get_transform(parent_frame="camera_depth_optical_frame", child_frame="mount")
+    # tran = np.array([tf_mount_to_camera.transform.translation.x, tf_mount_to_camera.transform.translation.y, tf_mount_to_camera.transform.translation.z])
+    # rot = o3d.geometry.get_rotation_matrix_from_quaternion(np.array([tf_mount_to_camera.transform.rotation.w,
+    #                                                                 tf_mount_to_camera.transform.rotation.x,
+    #                                                                 tf_mount_to_camera.transform.rotation.y,
+    #                                                                 tf_mount_to_camera.transform.rotation.z]))
     # pcd.rotate(rot, center=(0, 0, 0)).translate(tran)   
 
     #rospy.init_node('listener', anonymous=True)
