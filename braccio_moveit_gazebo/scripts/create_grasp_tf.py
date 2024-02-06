@@ -18,10 +18,44 @@ import pytransform3d.transformations as pytr
 
 from tf.transformations import quaternion_from_euler, quaternion_multiply
 
-import vision_utils, sherd3d
+import vision_utils, sherd3d, pcl_listener
+
+from custom_msgs.msg import SherdPose, SherdPcl, SherdPclList
+
+# def pcl_callback(msg):
+#         rospy.loginfo("Received PCL!")
+#         # try:
+#         #     # Convert your ROS Image message to OpenCV2
+#         #     cv2_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+#         # except CvBridgeError as e:
+#         #     print(e)
+#         # else:
+#         #     # Save your OpenCV2 image as a jpeg 
+#         #     cv2.imwrite('camera_image.jpg', cv2_img)
+
+# def pcl_listen():
+        
+#         rate = rospy.Rate(10)
+#         # Define your image topic
+#         pcl_topic = "/SherdPcls"
+#         # Set up your subscriber and define its callback
+#         pcl_listener = rospy.Subscriber(pcl_topic, SherdPclList, pcl_callback)
+#         rate.sleep()
+#         pcl_listener.unregister()
+#         # rate.sleep()
 
 if __name__ == '__main__':
 
+    rospy.init_node('grasp_creator', anonymous=True)
+
+    pcl_list = pcl_listener.Pcl_class()
+
+    pcl_list.pcl_listener()
+
+    msg_list = pcl_list.pcl_list
+
+    
+    
     tf_hand = vision_utils.get_transform(parent_frame="gripper_grasp_link",\
                                           child_frame="link_5")
     # print (tf)
@@ -37,7 +71,8 @@ if __name__ == '__main__':
     
     hand_tf = vision_utils.get_hand_tf()
 
-    initial_pose = np.concatenate((sherd3d.ros_pcl[0].get_center(), hand_tf))
+
+    initial_pose = np.concatenate((msg_list[0].get_center(), hand_tf))
     initial_pose = vision_utils.get_pose_from_arr(initial_pose)
 
     ### Transform the pose from the camera frame to the base frame (world)

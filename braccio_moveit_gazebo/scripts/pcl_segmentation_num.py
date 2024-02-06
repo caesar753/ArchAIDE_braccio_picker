@@ -16,11 +16,14 @@ from scipy.spatial.transform import Rotation as R
 from custom_msgs.msg import SherdPose, SherdPcl, SherdPclList
 
 
-def sherd_poses(objects):
+def sherd_poses(objects, stamp):
     bbox_objects = []
     bbox_poses = []
+    centers = []
     sherd_nr = 0
     for i in range(len(objects)):
+        object_center = objects.get_center()
+        centers.append(object_center)
         bbox_object = objects[i].get_oriented_bounding_box()
         bbox_rot = bbox_object.R
         print(f"rotation of bounding_box is {bbox_rot}")
@@ -36,7 +39,7 @@ def sherd_poses(objects):
         #Creating the PoseStamped sherd_msg
         sherd_msg = PoseStamped()
         #Filling the message
-        sherd_stamp = rospy.Time.now()
+        sherd_stamp = stamp
         sherd_msg.header.seq = sherd_nr
         sherd_msg.header.frame_id = ("sherd_" + str(sherd_nr))
         sherd_msg.header.stamp.secs = sherd_stamp.secs
@@ -50,13 +53,13 @@ def sherd_poses(objects):
         sherd_msg.pose.orientation.w = bbox_quat[0,3]
         bbox_poses.append(sherd_msg)
         sherd_nr += 1
-    return bbox_objects, sherd_msg, bbox_poses
+    return centers, bbox_objects, sherd_msg, bbox_poses
 
-def sherd_pcl(objects):
+def sherd_pcl(objects, st):
     ros_pcl = []
     for index, element in enumerate(objects):
         print(index)
-        pc2_o3d = orh.o3dpc_to_rospc(element,("pcl_frag_" + str(index)), stamp, seq_nr = index)
+        pc2_o3d = orh.o3dpc_to_rospc(element,("pcl_frag_" + str(index)), stamp = st, seq_nr = index)
         ros_pcl.append(pc2_o3d)
     return ros_pcl
 
@@ -86,7 +89,10 @@ if __name__ == '__main__':
     # object_cloud.paint_uniform_color([1, 0, 0])
     # table_cloud.paint_uniform_color([0, 0, 1])
     
-    bbox_objects, sherd_msg, bbox_poses = sherd_poses(objects_pcl, stamp)
+    centers, bbox_objects, sherd_msg, bbox_poses = sherd_poses(objects_pcl, stamp)
+    
+    centers_array = np.array(centers)
+
     sherd_pcl_list = sherd_pcl(objects_pcl, stamp)
 
     mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.00])
