@@ -12,14 +12,15 @@ from custom_msgs.msg import SherdPclList
 class Pcl_class(object):
 
     def __init__(self):
-        self.pcl_list = []
+        self.pcl_list = SherdPclList()
         self.i = 0
 
     def pcl_callback(self, msg):
-        rospy.loginfo("Received PCL!")
+        # rospy.loginfo("Received PCL!")
         try:           
             for i in range(len(msg.list)):
-                self.pcl_list.append(msg.list)
+                # print(i)
+                self.pcl_list = msg
                 self.i = i
         except: 
             print("Error occurred!")
@@ -29,13 +30,12 @@ class Pcl_class(object):
         return(self.i, self.pcl_list)
        
     def pcl_listener(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(1)
         pcl_listener = rospy.Subscriber("/SherdPcls", SherdPclList, self.pcl_callback)
         rospy.loginfo("PCL received!")
         rate.sleep()
         pcl_listener.unregister()
-        # print(pcl_listener)
-        # rospy.spin()
+
 
 # if __name__ == '__main__':
 

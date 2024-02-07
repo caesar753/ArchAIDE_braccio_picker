@@ -13,17 +13,18 @@ from open3d_ros_helper import open3d_ros_helper as orh
 import numpy as np
 # import scipy.spatial
 from scipy.spatial.transform import Rotation as R
+import pytransform3d.transformations as pytr
+
+
 from custom_msgs.msg import SherdPose, SherdPcl, SherdPclList
+
 
 
 def sherd_poses(objects, stamp):
     bbox_objects = []
     bbox_poses = []
-    centers = []
     sherd_nr = 0
     for i in range(len(objects)):
-        object_center = objects.get_center()
-        centers.append(object_center)
         bbox_object = objects[i].get_oriented_bounding_box()
         bbox_rot = bbox_object.R
         print(f"rotation of bounding_box is {bbox_rot}")
@@ -53,7 +54,7 @@ def sherd_poses(objects, stamp):
         sherd_msg.pose.orientation.w = bbox_quat[0,3]
         bbox_poses.append(sherd_msg)
         sherd_nr += 1
-    return centers, bbox_objects, sherd_msg, bbox_poses
+    return bbox_objects, sherd_msg, bbox_poses
 
 def sherd_pcl(objects, st):
     ros_pcl = []
@@ -78,7 +79,7 @@ if __name__ == '__main__':
 
     pcd = vision_utils.get_point_cloud_from_ros()
 
-    debug = True
+    debug = False
 
     num_frescos, pcd, table_cloud, object_cloud, objects_pcl = vision_utils.get_number_of_sherds(pcd, debug)#, use_pyrealsense)
     print (f'Number of frescos detected: {num_frescos}')
@@ -89,10 +90,8 @@ if __name__ == '__main__':
     # object_cloud.paint_uniform_color([1, 0, 0])
     # table_cloud.paint_uniform_color([0, 0, 1])
     
-    centers, bbox_objects, sherd_msg, bbox_poses = sherd_poses(objects_pcl, stamp)
+    bbox_objects, sherd_msg, bbox_poses = sherd_poses(objects_pcl, stamp)
     
-    centers_array = np.array(centers)
-
     sherd_pcl_list = sherd_pcl(objects_pcl, stamp)
 
     mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.00])
@@ -123,8 +122,7 @@ if __name__ == '__main__':
     sherds_pcl_msg = SherdPclList()
     sherds_pcl_msg.list = sherd_pcl_list
     SherdPcl_pub = rospy.Publisher('/SherdPcls', SherdPclList, queue_size = 10)
-
-
+    
     try:
         # Publishing the messages
         while not rospy.is_shutdown():

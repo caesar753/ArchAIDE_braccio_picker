@@ -39,8 +39,10 @@ def get_hand_tf():
 
     transf1 = R.from_euler('y', -90, degrees=True)
     # transf2 = R.from_euler('z', -90, degrees=True)
-    matF = transf1.apply(quat_to_mat)
+    transf3 = R.from_euler('y', 180, degrees=True)
+    # matF = transf1.apply(quat_to_mat)
     # matF = transf2.apply(matF)
+    matF = transf3.apply(quat_to_mat)
     matF_to_quat = R.from_matrix(matF).as_quat()
 
     return matF_to_quat

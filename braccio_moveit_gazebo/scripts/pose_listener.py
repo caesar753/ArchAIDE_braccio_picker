@@ -31,13 +31,13 @@ class Pose_class(object):
         # print(pcl_listener)
         # rospy.spin()
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    pose_c = Pose_class()
+#     pose_c = Pose_class()
     
-    rospy.init_node('pose_listener')
+#     rospy.init_node('pose_listener')
 
-    pose_c.pose_listener()
-    print(pose_c.pose_list[1])
+#     pose_c.pose_listener()
+#     print(pose_c.pose_list[1])
     # lista2 = pcl.pcl_list
     # print(lista2[1])
