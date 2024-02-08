@@ -22,6 +22,7 @@ from tf.transformations import quaternion_from_euler, quaternion_multiply
 from open3d_ros_helper import open3d_ros_helper as orh
 
 import vision_utils, sherd3d, pcl_listener
+import auto_targetter
 
 from custom_msgs.msg import SherdPose, SherdPcl, SherdPclList
 
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     rospy.init_node('grasp_creator', anonymous=True)
 
     pcl_list = pcl_listener.Pcl_class()
+    targetter = auto_targetter.BraccioObjectTargetInterface()
 
     debug = False
     pcl_list.pcl_listener()
@@ -85,6 +87,9 @@ if __name__ == '__main__':
 
         arm_target_pose_np = vision_utils.get_pose_from_transform(T1)
 
-        # arm_target_pose_np = get_arr_from_pose(arm_target_pose)
+        # arm_target_pose_np = vision_utils.get_arr_from_pose(arm_target_pose)
         vision_utils.publish_tf_np(arm_target_pose_np, child_frame='arm_grasp_pose')
-        arm_target_pose = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
+        arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
+        arm_target_pose = vision_utils.get_pose_from_arr(arm_target_pose_np)
+        print(type(arm_target_pose))
+        targetter.go_to_pos(arm_target_pose_stamped)

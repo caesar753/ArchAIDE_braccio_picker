@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import auto_targetter
+# import auto_targetter
 import measure_inference
 import image_listener
 import vision_utils

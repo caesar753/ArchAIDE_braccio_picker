@@ -4,6 +4,7 @@ import time
 import os
 import  numpy as np
 import scipy
+from scipy.spatial.transform import Rotation
 
 
 class Arm3Link:
@@ -76,3 +77,33 @@ class Arm3Link:
                                                y_lower_constraint])
         self.q = q
         return self.q
+    
+    def revolute_ik(self, current_joint_angle, desired_quaternion):
+        # Convert quaternion to rotation matrix
+        rotation = Rotation.from_quat(desired_quaternion)
+        print(rotation)
+        rotation_matrix = rotation.as_matrix()
+        print(rotation_matrix)
+
+        # Assuming the joint axis is along the Z-axis
+        joint_axis = np.array([0, 0, 1])
+
+        # Rotate the joint axis to the desired orientation
+        rotated_joint_axis = np.dot(rotation_matrix, joint_axis)
+        print(rotated_joint_axis)
+
+
+        # Calculate the angle between the current joint axis and the rotated joint axis
+        angle = np.arccos(np.clip(np.dot(joint_axis, rotated_joint_axis), -1.0, 1.0))
+        print(angle)
+
+
+        # Determine the sign of the angle based on the cross product
+        cross_product = np.cross(joint_axis, rotated_joint_axis)
+        if np.dot(cross_product, np.array([0, 0, 1])) < 0:
+            angle = -angle
+
+        # Update the joint angle
+        new_joint_angle = current_joint_angle + angle
+
+        return new_joint_angle

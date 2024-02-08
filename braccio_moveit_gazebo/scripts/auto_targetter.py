@@ -60,10 +60,11 @@ class BraccioObjectTargetInterface(object):
     super(BraccioObjectTargetInterface, self).__init__()
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('braccio_xy_bb_target', anonymous=True)
+    # rospy.init_node('braccio_xy_bb_target', anonymous=True)
     self.states_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.linkstate_callback)
     self.targets_list = []
     self.i = 0
+    self.quat = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
     # Subscriber to /targets topic with matrix message
     self.target_matrix = rospy.Subscriber("/targets", matrix, self.callback_matrix)
     #sleep else ROS cannot get the robot state and the matrix msg
@@ -95,7 +96,10 @@ class BraccioObjectTargetInterface(object):
     if self.homography is not None:
       a = np.array([[x1, y1]], dtype='float32')
       res = cv2.perspectiveTransform(a[None, :, :], self.homography)[0][0]
-      return float(res[0]), float(res[1]), DEFAULT_ROT
+      # return float(res[0]), float(res[1]), DEFAULT_ROT
+      self.quat = np.array([r.x, r.y, r.z, r.w], dtype = np.float64)
+      print(type(self.quat))
+      return float(res[0]), float(res[1]), self.quat
     else:
       raise ValueError('run or load calibration first!')
 
@@ -125,10 +129,13 @@ class BraccioObjectTargetInterface(object):
       print(l)
       ind = self.linkstate_data.name.index(l)
       res = self.linkstate_data.pose[ind].position
+      ori = self.linkstate_data.pose[ind].orientation
       x += res.x
       y += res.y
       n += 1
-    return x/n, y/n, DEFAULT_ROT
+    # return x/n, y/n, DEFAULT_ROT
+      print(ori)
+      return x/n, y/n, ori
 
   def calibrate(self):
     joint_home = self.move_group.get_current_joint_values()
@@ -234,6 +241,28 @@ class BraccioObjectTargetInterface(object):
     ret = self.move_group.go(joint_goal, wait=True)
     self.move_group.stop()
 
+  def go_to_joint_gripper(self, joint_targets):
+    joint_goal = self.move_group.get_current_joint_values()
+    joint_goal = joint_targets
+    joint_goal[4] = joint_targets[4]
+    ret = self.move_group.go(joint_goal, wait=True)
+    self.move_group.stop()
+
+    ##ADDED FROM REPAIR MOVEIT_TEST
+  def go_to_pos(self, target_pose):
+        joint_goal = self.move_group.get_current_joint_values()
+        # move_arm_to_pose_req = MoveArmToPoseRequest()
+        # move_arm_to_pose_req.arm = ARM_ENUM.ARM_2.value
+        # move_arm_to_pose_req.target_pose = target_pose
+        # self.move_to_pose(ARM_ENUM.ARM_2, target_pose)
+        self.move_group.set_pose_target(target_pose)
+        # get plan
+        _, plan, _, _ = self.move_group.plan()
+        # plan = self.move_group.plan()
+        # self.move_group.execute(plan)
+
+        # len_points = len(plan.joint_trajectory.points)
+
   def gripper_close(self):
     self.go_gripper(1.20)
 
@@ -283,7 +312,7 @@ class BraccioObjectTargetInterface(object):
     self.go_to_j(j1=0.3,j2=1.8,j3=0.1)
     self.go_to_j(j1=2.1,j2=0.01,j3=0.01)
     self.go_to_j(j1=2.7,j2=0.01,j3=0.01)
-
+  
   def get_targets(self,x,y):
     s, phi = cart2pol(x,y)
     q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_SIDE, 0)
@@ -306,6 +335,19 @@ class BraccioObjectTargetInterface(object):
       print('closest solution = '+str(xy[0]))
       return s, [phi, np.NaN, np.NaN, np.NaN]
     return s, [phi, q[0], q[1]+np.pi/2, q[2]+np.pi/2]
+  
+
+  ####NEW DEF FOR ROTATION GRIPPER###
+  def go_rotation_gripper(self, object_rotation):
+    joint_gripper = self.move_group.get_current_joint_values()
+    print(f'old values for joint gripper are: {joint_gripper}')
+    new_gripper_angle = self.kinematics.revolute_ik(joint_gripper[4], object_rotation)
+    joint_gripper[4] = new_gripper_angle
+    print(f'NEW values for joint gripper are: {joint_gripper}')
+    input("press a key")
+    self.go_to_joint_gripper(joint_gripper)
+  ####NEW DEF FOR ROTATION GRIPPER###
+
 
   def go_to_xy(self, x, y, r, how, bowl):
     if how=='top':
@@ -335,7 +377,7 @@ class BraccioObjectTargetInterface(object):
     #   if np.isnan(joint_targets[1]):
     #     print('++++++ Not in reachable area, aborting ++++++')
     #     return -1
-
+    
     self.go_to_raise()
 
     self.gripper_open()
@@ -344,6 +386,10 @@ class BraccioObjectTargetInterface(object):
     self.go_to_j(j1=float(joint_targets[1]),
                  j2=float(joint_targets[2]),
                  j3=float(joint_targets[3]))
+    
+    if self.quat is not None:
+      print("i'm rotating the gripper!!")
+      self.go_rotation_gripper(self.quat)
 
     self.gripper_close()
     # if how=='top' and joint_targets[2]<3:
