@@ -9,7 +9,7 @@ from std_msgs.msg import Header
 
 import open3d as o3d
 from open3d_ros_helper import open3d_ros_helper as orh
-# import auto_targetter
+import auto_targetter
 import numpy as np
 # import scipy.spatial
 from scipy.spatial.transform import Rotation as R
@@ -67,9 +67,10 @@ def sherd_pcl(objects, st):
 
 if __name__ == '__main__':
 
-    # targetter = auto_targetter.BraccioObjectTargetInterface()
-
     rospy.init_node('pcl_vis', anonymous=True)
+    
+    targetter = auto_targetter.BraccioObjectTargetInterface(rospy)
+    
     stamp = rospy.Time.now()
     rate = rospy.Rate(10)
 

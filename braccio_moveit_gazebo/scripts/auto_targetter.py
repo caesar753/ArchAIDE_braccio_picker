@@ -5,8 +5,10 @@ import rospy
 import moveit_commander
 import time
 
+
 from gazebo_msgs.msg import LinkStates, ModelState
-from geometry_msgs.msg import Pose
+import moveit_msgs.msg
+from geometry_msgs.msg import Pose, PoseStamped
 from gazebo_msgs.srv import SetModelState
 from custom_msgs.msg import matrix
 
@@ -18,7 +20,7 @@ import json
 
 import InvKin #as Arm3Link
 # from InvKin import get_xy
-# from InvKin import inv_kin
+# from InvKin import inv_kin    
 
 THETA_EXT = 0.27
 THETA_RET = np.pi/4
@@ -56,11 +58,13 @@ def get_other_angles(theta_shoulder):
 
 class BraccioObjectTargetInterface(object):
   """BraccioXYBBTargetInterface"""
-  def __init__(self):
+  def __init__(self, node_handle):
     super(BraccioObjectTargetInterface, self).__init__()
 
+    self.nh = node_handle
+
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('braccio_xy_bb_target', anonymous=True)
+    # rospy.init_node('braccio_xy_bb_target', anonymous=True)
     self.states_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.linkstate_callback)
     self.targets_list = []
     self.i = 0
@@ -69,7 +73,7 @@ class BraccioObjectTargetInterface(object):
     #sleep else ROS cannot get the robot state and the matrix msg
     rospy.sleep(1)
     #unregister target_matrix subscriber
-    self.target_matrix.unregister()
+    self.target_matrix.unregister()  
 
     group_name = "braccio_arm"
     self.move_group = moveit_commander.MoveGroupCommander(group_name)
@@ -235,7 +239,7 @@ class BraccioObjectTargetInterface(object):
     self.move_group.stop()
 
   def gripper_close(self):
-    self.go_gripper(1.20)
+    self.go_gripper(1.175)
 
   def gripper_open(self):
     self.go_gripper(0.9)
@@ -341,9 +345,13 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
     self.go_to_j(j0=float(joint_targets[0]))
 
-    self.go_to_j(j1=float(joint_targets[1]),
+    self.go_to_j(j1=float(joint_targets[1]-0.125),
                  j2=float(joint_targets[2]),
-                 j3=float(joint_targets[3]))
+                 j3=float(joint_targets[3])+0.13)
+
+    self.go_to_j(j2=float(joint_targets[2]-0.08))
+    
+    # self.go_to_j(j3=float(joint_targets[3])+0.125)
 
     self.gripper_close()
     # if how=='top' and joint_targets[2]<3:

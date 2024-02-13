@@ -193,7 +193,7 @@
                 <axis xyz="1 0 0" />
                 <limit effort="1.0" lower="0.2618" upper="2.8798" velocity="1.0" />
                 <!-- <origin rpy="-1.587 0 0" xyz="0 -.002 0.072" /> -->
-                <origin rpy="2.0 0 0" xyz="0 -.002 0.072" />
+                <origin rpy="2.0 0 0" xyz="0 -.002 0.1" />
                 <parent link="link_1" />
                 <child link="link_2" />
                 <dynamics damping="0.1" friction="0.001" />

@@ -9,4 +9,4 @@ controller_list:
 
 initial:  # Define initial robot pose to max_top
   - group: braccio_arm
-    pose: max_top
+    pose: all_up

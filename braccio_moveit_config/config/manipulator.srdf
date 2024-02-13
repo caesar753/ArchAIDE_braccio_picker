@@ -38,6 +38,14 @@
         <joint name="wrist_pitch_joint" value="0" />
         <joint name="wrist_roll_joint" value="0" />
     </group_state>
+    <group_state name="all_up" group="braccio_arm">
+        <joint name="base_joint" value="0"/>
+        <joint name="elbow_joint" value="1.58"/>
+        <joint name="shoulder_joint" value="1.58"/>
+        <joint name="wrist_pitch_joint" value="1.58"/>
+        <joint name="wrist_roll_joint" value="0"/>
+    </group_state>
+    
     <group_state name="freaky" group="braccio_arm">
         <joint name="base_joint" value="-1.0107" />
         <joint name="shoulder_joint" value="-2.6011" />

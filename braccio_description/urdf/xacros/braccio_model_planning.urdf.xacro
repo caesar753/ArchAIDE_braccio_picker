@@ -191,7 +191,7 @@
     <joint name="shoulder_joint" type="revolute">
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="0.2618" upper="2.8798" velocity="1.0" />
-        <origin rpy="-1.5708 0 0" xyz="0 -.002 0.072" />
+        <origin rpy="-1.5708 0 0" xyz="0 -.002 0.10" />
         <parent link="link_1" />
         <child link="link_2" />
         <dynamics damping="0.1" friction="0.001" />
