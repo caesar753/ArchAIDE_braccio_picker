@@ -6,7 +6,10 @@ import auto_targetter
 
 if __name__ == '__main__':
     
-    targetter = auto_targetter.BraccioObjectTargetInterface()
+    rospy.init_node('targetter_subscriber', anonymous=True)
+
+
+    targetter = auto_targetter.BraccioObjectTargetInterface(rospy)
 
     targetter.load_calibrate()
 

@@ -178,6 +178,7 @@
         </collision>
     </link>
 
+
     <joint name="base_joint" type="revolute">
         <axis xyz="0 0 -1" />
         <limit effort="1000.0" lower="0.0" upper="3.1416" velocity="1.0" />
@@ -190,7 +191,7 @@
     <joint name="shoulder_joint" type="revolute">
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="0.2618" upper="2.8798" velocity="1.0" />
-        <origin rpy="-1.5708 0 0" xyz="0 -.002 0.072" />
+        <origin rpy="-1.5708 0 0" xyz="0 -.002 0.10" />
         <parent link="link_1" />
         <child link="link_2" />
         <dynamics damping="0.1" friction="0.001" />
@@ -239,6 +240,7 @@
         <child link="left_gripper_link" />
         <dynamics damping="0.1" friction="0.001" />
     </joint>
+
 
     <material name="orange">
         <color rgba="0.57 0.17 0.0 1" />
@@ -350,6 +352,14 @@
         <child link="base_link"/>
     </joint>
     
+    <!-- Fake joint and link for grasping -->
+    <joint name="braccio_grasp_joint" type="fixed">
+        <origin rpy="0 1.835 0.0" xyz="0.09 0.0 -0.025"/>
+        <parent link="left_gripper_link" />
+        <child link="gripper_grasp_link" />
+    </joint>
+
+    <link name="gripper_grasp_link"/>
     </xacro:macro>
     
 
