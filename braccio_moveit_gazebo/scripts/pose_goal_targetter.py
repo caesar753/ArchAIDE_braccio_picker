@@ -119,12 +119,14 @@ class BraccioPoseGoal(object):
 
     group_name = "braccio_arm"
     self.move_group = moveit_commander.MoveGroupCommander(group_name)
+    self.move_group.set_planner_id("RRTConnectkConfigDefault")
     self.gripper_group = moveit_commander.MoveGroupCommander("braccio_gripper")
 
     self.homography = None
 
     self.kinematics = InvKin.Arm3Link()
 
+    self.random_pose = PoseStamped()
 
     self.display_trajectory_publisher = rospy.Publisher(
     "/move_group/display_planned_path",
@@ -241,13 +243,13 @@ class BraccioPoseGoal(object):
         # self.move_to_pose(ARM_ENUM.ARM_2, target_pose)
         pose_start = self.move_group.get_current_pose()
 
-        target_int = Pose()
+        # target_int = Pose()
         # target_int.position.x = target_pose.position.x
         # target_int.position.y = target_pose.position.y
-        target_int.position.z = target_pose.position.z
+        # target_int.position.z = target_pose.position.z
         # target_int.orientation.w = target_pose.orientation.w
 
-        self.move_group.set_pose_target(target_int)
+        self.move_group.set_pose_target(target_pose)
 
          ## Now, we call the planner to compute the plan and execute it.
         # `go()` returns a boolean indicating whether the planning and execution was successful.
@@ -302,52 +304,114 @@ class BraccioPoseGoal(object):
     print("")
 
 
-  def planning_pose_example(self):
-    # self.move_group.set_end_effector_link("link_5")
+  def random(self):
+    random_pose = self.move_group.get_random_pose()
+    # print(type(random_pose))
+    # print(random_pose)
+    self.random_pose = random_pose
+    print(f'Random pose is \n \
+      {self.random_pose}')
+    return self.random_pose
+  
+  def planning_pose_random(self):
     print(f"End effector link is {self.move_group.get_end_effector_link()}")
 
     pose_start = self.move_group.get_current_pose()
     print(f"pose_start is\n \
-          {pose_start}")
+            {pose_start}")
 
     self.move_group.set_planning_time(10)
     self.move_group.set_num_planning_attempts(5)
-    pose_goal = Pose()
-    # pose_goal.header = pose_start.header
-    # # pose_goal.position = pose_start.pose.position
+    self.move_group.set_goal_tolerance(0.5)
 
-    # pose_goal.position.x = pose_start.pose.position.x + 0.1
-    # pose_goal.position.y = pose_start.pose.position.y + 0.1
-    pose_goal.position.z = pose_start.pose.position.z + 0.1
-    # pose_goal.orientation.w = pose_start.pose.orientation.w + 0.1
+    print(f" Random pose goal is \n \
+      {self.random_pose}")
+
+    self.move_group.set_pose_target(self.random_pose)
+
+    success = self.move_group.go(wait=True)
+    print(success)
+    self.move_group.stop()
+
+    self.move_group.clear_pose_targets()
+
+  def planning_pose_example(self):
+    print(f"End effector link is {self.move_group.get_end_effector_link()}")
+
+    pose_start = self.move_group.get_current_pose()
+    print(f"pose_start is\n \
+            {pose_start}")
+
+    self.move_group.set_planning_time(10)
+    self.move_group.set_num_planning_attempts(5)
+    self.move_group.set_goal_tolerance(0.5)
+    
+    pose_goal = Pose()
+    pose_goal.position.z = pose_start.pose.position.z + 0.5
+    pose_goal.orientation.w = 1.0
+    pose_goal.orientation = pose_start.pose.orientation
 
     print(f" pose goal is {pose_goal}")
 
-    # pose_goal_2 = Pose()
-    # pose_goal_2.position.z = pose_start.pose.position.z - 0.1
-    # pippo = self.move_group.set_pose_target(pose_goal)
-    
-    # self.move_group.set_goal_tolerance(0.2)
     self.move_group.set_pose_target(pose_goal)
-    # # print(f"set_pose_target is {pippo}")    
-
-    # # `go()` returns a boolean indicating whether the planning and execution was successful.
+    
     success = self.move_group.go(wait=True)
     print(success)
-    # # Calling `stop()` ensures that there is no residual movement
+
     self.move_group.stop()
-    # # It is always good to clear your targets after planning with poses.
-    # # Note: there is no equivalent function for clear_joint_value_targets().
+    
     self.move_group.clear_pose_targets()
 
-    # # current_pose = prova_move.get_current_pose().pose
-    # # return all_close(pose_goal, current_pose, 0.01)
 
-    # get plan
-    # _, plan, _, _ = self.move_group.plan()
-    # print(plan)
-    # # plan = self.move_group.plan()
-    # self.move_group.execute(plan)
+
+  # def planning_pose_example(self):
+  #   # self.move_group.set_end_effector_link("link_5")
+  #   print(f"End effector link is {self.move_group.get_end_effector_link()}")
+
+  #   pose_start = self.move_group.get_current_pose()
+  #   print(f"pose_start is\n \
+  #         {pose_start}")
+
+  #   self.move_group.set_planning_time(10)
+  #   self.move_group.set_num_planning_attempts(5)
+  #   self.move_group.set_goal_tolerance(1.5)
+  #   pose_goal = Pose()
+  #   # pose_goal.header = pose_start.header
+  #   # # pose_goal.position = pose_start.pose.position
+
+  #   # pose_goal.position.x = pose_start.pose.position.x + 0.1
+  #   # pose_goal.position.y = pose_start.pose.position.y + 0.1
+  #   pose_goal.position.z = pose_start.pose.position.z + 0.1
+  #   # pose_goal.orientation.w = pose_start.pose.orientation.w + 0.1
+  #   pose_goal.orientation.w = 1.0
+
+  #   print(f" pose goal is {self.random_pose}")
+
+  #   # pose_goal_2 = Pose()
+  #   # pose_goal_2.position.z = pose_start.pose.position.z - 0.1
+  #   # pippo = self.move_group.set_pose_target(pose_goal)
+    
+  #   # self.move_group.set_goal_tolerance(0.2)
+  #   self.move_group.set_pose_target(self.random_pose)
+  #   # # print(f"set_pose_target is {pippo}")    
+
+  #   # # `go()` returns a boolean indicating whether the planning and execution was successful.
+  #   success = self.move_group.go(wait=True)
+  #   print(success)
+  #   # # Calling `stop()` ensures that there is no residual movement
+  #   self.move_group.stop()
+  #   # # It is always good to clear your targets after planning with poses.
+  #   # # Note: there is no equivalent function for clear_joint_value_targets().
+  #   self.move_group.clear_pose_targets()
+
+  #   # # current_pose = prova_move.get_current_pose().pose
+  #   # # return all_close(pose_goal, current_pose, 0.01)
+
+  #   # get plan
+  #   # _, plan, _, _ = self.move_group.plan()
+  #   # print(plan)
+  #   # # plan = self.move_group.plan()
+  #   # self.move_group.execute(plan)
 
   def set_standard_position(self, position):
     self.move_group.set_goal_tolerance(0.2)
@@ -372,6 +436,7 @@ class BraccioPoseGoal(object):
     # pose_goal.position.y = pose_start.pose.position.y + 0.1
     pose_goal.position.z = pose_start.pose.position.z + 0.15
     # pose_goal.orientation.w = pose_start.pose.orientation.w + 0.1
+    pose_goal.orientation.w = 1.0
 
     print(f" pose goal is {pose_goal}")
 

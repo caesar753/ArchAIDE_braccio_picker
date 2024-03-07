@@ -36,35 +36,39 @@ if __name__ == '__main__':
     hand_tf = vision_utils.get_hand_tf()
 
 
-    # initial_pose = np.concatenate(([0.25, 0.10, 0.03], hand_tf))
-    # initial_pose = vision_utils.get_pose_from_arr(initial_pose)
+    initial_pose = np.concatenate(([0.10, 0.10, 0.03], hand_tf))
+    initial_pose = vision_utils.get_pose_from_arr(initial_pose)
 
-    # ### Transform the pose from the camera frame to the base frame (world)
-    # # hand_pose_world = vision_utils.transform_pose_vislab(initial_pose, "camera_depth_optical_frame", "world")
-    # # hand_pose_world_np = vision_utils.get_arr_from_pose(hand_pose_world)
+    ### Transform the pose from the camera frame to the base frame (world)
+    hand_pose_world = vision_utils.transform_pose_vislab(initial_pose, "camera_depth_optical_frame", "world")
+    hand_pose_world_np = vision_utils.get_arr_from_pose(hand_pose_world)
 
-    # hand_pose_world_np = vision_utils.get_arr_from_pose(initial_pose)
+    hand_pose_world_np = vision_utils.get_arr_from_pose(initial_pose)
     
-    # # hand_pose_world_np[0] += 0.04
-    # # hand_pose_world_np[1] += 0.03
-    # # # hand_pose_world_np[2] = 1.15 + 0.15
-    # hand_pose_world_np[2] += 0.01
-    # hand_pose_world_np[3:] = hand_tf
-    # vision_utils.publish_tf_np(hand_pose_world_np, child_frame='hand_grasp_pose')
+    # hand_pose_world_np[0] += 0.04
+    # hand_pose_world_np[1] += 0.03
+    # # hand_pose_world_np[2] = 1.15 + 0.15
+    hand_pose_world_np[2] += 0.01
+    hand_pose_world_np[3:] = hand_tf
+    vision_utils.publish_tf_np(hand_pose_world_np, child_frame='hand_grasp_pose')
 
-    # hand_pose_world_np[3:] = np.roll(hand_pose_world_np[3:], 1)
-    # T0 = pytr.transform_from_pq(hand_pose_world_np)
-    # T1 = pytr.concat(hand_arm_transform, T0)
+    hand_pose_world_np[3:] = np.roll(hand_pose_world_np[3:], 1)
+    T0 = pytr.transform_from_pq(hand_pose_world_np)
+    T1 = pytr.concat(hand_arm_transform, T0)
 
-    # arm_target_pose_np = vision_utils.get_pose_from_transform(T1)
+    arm_target_pose_np = vision_utils.get_pose_from_transform(T1)
 
-    # # arm_target_pose_np = vision_utils.get_arr_from_pose(arm_target_pose)
-    # vision_utils.publish_tf_np(arm_target_pose_np, child_frame='arm_grasp_pose')
-    # arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
-    # arm_target_pose = vision_utils.get_pose_from_arr(arm_target_pose_np)
-    # print(type(arm_target_pose))
+    # arm_target_pose_np = vision_utils.get_arr_from_pose(arm_target_pose)
+    vision_utils.publish_tf_np(arm_target_pose_np, child_frame='arm_grasp_pose')
+    arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
+    arm_target_pose = vision_utils.get_pose_from_arr(arm_target_pose_np)
+    print(type(arm_target_pose))
 
     pose_targetter.get_planning_infos()
+    # pose_targetter.random()
+
+    # pose_targetter.planning_pose_random()
+    
     pose_targetter.planning_pose_example()
     
     # pos = input("choose one default position")
