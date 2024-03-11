@@ -7,11 +7,23 @@ Panels:
         - /MotionPlanning1
         - /MotionPlanning1/Scene Geometry1
         - /MotionPlanning1/Scene Robot1
+        - /MotionPlanning1/Scene Robot1/Links1
+        - /MotionPlanning1/Scene Robot1/Links1/camera_bottom_screw_frame1
         - /MotionPlanning1/Planning Request1
+        - /MotionPlanning1/Planning Metrics1
         - /MotionPlanning1/Planned Path1
         - /PointCloud21
         - /TF1
         - /TF1/Frames1
+        - /TF1/Tree1
+        - /TF1/Tree1/world1
+        - /TF1/Tree1/world1/mount1
+        - /TF1/Tree1/world1/mount1/base_link1
+        - /TF1/Tree1/world1/mount1/base_link1/link_11
+        - /TF1/Tree1/world1/mount1/base_link1/link_11/link_21
+        - /TF1/Tree1/world1/mount1/base_link1/link_11/link_21/link_31
+        - /TF1/Tree1/world1/mount1/camera_bottom_screw_frame1
+        - /TF1/Tree1/world1/mount1/camera_bottom_screw_frame1/camera_link1
       Splitter Ratio: 0.5804701447486877
     Tree Height: 568
   - Class: rviz/Help
@@ -171,12 +183,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Loop Animation: true
+        Loop Animation: false
         Robot Alpha: 0.30000001192092896
         Robot Color: 78; 154; 6
         Show Robot Collision: false
         Show Robot Visual: true
-        Show Trail: true
+        Show Trail: false
         State Display Time: 0.05 s
         Trail Step Size: 1
         Trajectory Topic: move_group/display_planned_path
@@ -187,7 +199,7 @@ Visualization Manager:
         Show Manipulability: false
         Show Manipulability Index: false
         Show Weight Limit: false
-        TextHeight: 0.07999999821186066
+        TextHeight: 0.004999999888241291
       Planning Request:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
@@ -195,7 +207,7 @@ Visualization Manager:
         Interactive Marker Size: 0
         Joint Violation Color: 52; 101; 164
         Planning Group: braccio_arm
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -312,7 +324,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
         Robot Alpha: 0.5
-        Show Robot Collision: false
+        Show Robot Collision: true
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
@@ -351,6 +363,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        arm_grasp_pose:
+          Value: true
         base_link:
           Value: false
         camera_bottom_screw_frame:
@@ -375,6 +389,8 @@ Visualization Manager:
           Value: false
         gripper_grasp_link:
           Value: true
+        hand_grasp_pose:
+          Value: true
         left_gripper_link:
           Value: false
         link_1:
@@ -386,7 +402,7 @@ Visualization Manager:
         link_4:
           Value: false
         link_5:
-          Value: true
+          Value: false
         mount:
           Value: false
         right_gripper_link:
@@ -398,9 +414,13 @@ Visualization Manager:
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
         world:
+          arm_grasp_pose:
+            {}
+          hand_grasp_pose:
+            {}
           mount:
             base_link:
               link_1:
@@ -408,9 +428,10 @@ Visualization Manager:
                   link_3:
                     link_4:
                       link_5:
+                        gripper_grasp_link:
+                          {}
                         left_gripper_link:
-                          gripper_grasp_link:
-                            {}
+                          {}
                         right_gripper_link:
                           {}
             camera_bottom_screw_frame:
@@ -445,7 +466,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 1.0321929454803467
+      Distance: 1.698331594467163
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -461,9 +482,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.13979703187942505
+      Pitch: 0.039796989411115646
       Target Frame: world
-      Yaw: 6.084950923919678
+      Yaw: 6.169949531555176
     Saved: ~
 Window Geometry:
   Displays:
