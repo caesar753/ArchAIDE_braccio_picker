@@ -5,6 +5,10 @@ import numpy as np
 import pytransform3d.transformations as pytr
 
 from scipy.spatial.transform import Rotation
+
+
+from tf.transformations import quaternion_from_euler, quaternion_multiply
+
 # import quaternion
 # from custom_msgs.msg import matrix
 
@@ -53,24 +57,21 @@ if __name__ == '__main__':
     # hand_pose_world_np[0] += 0.4
     # hand_pose_world_np[1] += 0.25
     # # hand_pose_world_np[2] = 1.15 + 0.15
-    hand_pose_world_np[2] -= 0.05
+    hand_pose_world_np[2] += 0.025
     hand_pose_world_np[3:] = hand_tf
 
-    hand_pose_world_quaternion = hand_pose_world_np[3:]
-    print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+    # hand_pose_world_quaternion = hand_pose_world_np[3:]
+    # print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
 
-    rotation_matrix = Rotation.from_euler('x', 15, degrees=True).as_matrix()
+    # rotation_quaternion = quaternion_from_euler(-1.57, 0, 0)
 
-    hand_pose_world_matrix = Rotation.from_quat(hand_pose_world_quaternion).as_matrix()
-
-    # Perform the rotation
-    hand_pose_world_matrix_rotated = np.dot(rotation_matrix, hand_pose_world_matrix)
-    hand_pose_world_quaternion = Rotation.from_matrix(hand_pose_world_matrix_rotated).as_quat()
-    print(f"rotated hand_pose_world_quaternion is {hand_pose_world_quaternion}")
-
-    hand_pose_world_np[3:] = hand_pose_world_quaternion
+    # hand_pose_world_quaternion = quaternion_multiply(rotation_quaternion, hand_pose_world_quaternion)
     
-    print(f"final hand_pose_world_np is {hand_pose_world_np}")
+    # print(f"rotated hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+
+    # hand_pose_world_np[3:] = hand_pose_world_quaternion
+    
+    # print(f"final hand_pose_world_np is {hand_pose_world_np}")
     
     vision_utils.publish_tf_np(hand_pose_world_np, child_frame='hand_grasp_pose')
 

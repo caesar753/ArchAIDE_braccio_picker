@@ -364,7 +364,7 @@
     
     <!-- Fake joint and link for grasping -->
     <joint name="braccio_grasp_joint" type="continuous">
-        <origin rpy="0 0 0.0" xyz="0.0 0.0 0.115"/>
+        <origin rpy="0 0 0.0" xyz="0.0 0.0 0.03"/>
         <parent link="link_5" />
         <child link="gripper_grasp_link" />
     </joint>
