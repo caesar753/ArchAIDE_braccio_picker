@@ -7,7 +7,7 @@ import pytransform3d.transformations as pytr
 from scipy.spatial.transform import Rotation
 
 
-from tf.transformations import quaternion_from_euler, quaternion_multiply
+from tf.transformations import quaternion_from_euler, quaternion_about_axis, quaternion_multiply
 
 # import quaternion
 # from custom_msgs.msg import matrix
@@ -26,8 +26,8 @@ if __name__ == '__main__':
 
     rate = rospy.Rate(100)
     
-    tf_hand = vision_utils.get_transform(parent_frame="gripper_grasp_link",\
-                                            child_frame="link_5")
+    tf_hand = vision_utils.get_transform(parent_frame="central_gripper_link",\
+                                            child_frame="arm_grasp_link")
     # print (tf)
 
     hand_arm_transform = pytr.transform_from_pq([tf_hand.transform.translation.x,
@@ -41,8 +41,11 @@ if __name__ == '__main__':
     
     hand_tf = vision_utils.get_hand_tf()
 
+    print(f"hand_tf is {hand_tf}")
 
-    initial_pose = np.concatenate(([0.10, 0.10, 0.03], hand_tf))
+    # tf_rotation_quaternion = quaternion_about_axis(0.39, (0,0,-1))
+
+    initial_pose = np.concatenate(([0.05, 0.25, 0.005], hand_tf))
     initial_pose = vision_utils.get_pose_from_arr(initial_pose)
 
     ### Transform the pose from the camera frame to the base frame (world)
@@ -58,22 +61,22 @@ if __name__ == '__main__':
     # hand_pose_world_np[1] += 0.25
     # # hand_pose_world_np[2] = 1.15 + 0.15
     hand_pose_world_np[2] += 0.025
-    hand_pose_world_np[3:] = hand_tf
+    # hand_pose_world_np[3:] = hand_tf
 
-    # hand_pose_world_quaternion = hand_pose_world_np[3:]
-    # print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+    hand_pose_world_quaternion = hand_pose_world_np[3:]
+    print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
 
-    # rotation_quaternion = quaternion_from_euler(-1.57, 0, 0)
+    rotation_quaternion = quaternion_from_euler(0, 0, 1.17)
 
-    # hand_pose_world_quaternion = quaternion_multiply(rotation_quaternion, hand_pose_world_quaternion)
+    hand_pose_world_quaternion = quaternion_multiply(rotation_quaternion, hand_pose_world_quaternion)
     
-    # print(f"rotated hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+    print(f"rotated hand_pose_world_quaternion is {hand_pose_world_quaternion}")
 
-    # hand_pose_world_np[3:] = hand_pose_world_quaternion
+    hand_pose_world_np[3:] = hand_pose_world_quaternion
     
-    # print(f"final hand_pose_world_np is {hand_pose_world_np}")
+    print(f"final hand_pose_world_np is {hand_pose_world_np}")
     
-    vision_utils.publish_tf_np(hand_pose_world_np, child_frame='hand_grasp_pose')
+    vision_utils.publish_tf_np(hand_pose_world_np, child_frame='gripper_grasp_pose')
 
     hand_pose_world_np[3:] = np.roll(hand_pose_world_np[3:], 1)
     

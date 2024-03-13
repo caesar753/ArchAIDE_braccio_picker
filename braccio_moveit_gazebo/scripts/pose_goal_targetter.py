@@ -237,11 +237,11 @@ class BraccioPoseGoal(object):
 
     pose_start = self.move_group.get_current_pose()
 
-    self.move_group.set_planning_time(10)
-    self.move_group.set_num_planning_attempts(5)
+    self.move_group.set_planning_time(20)
+    self.move_group.set_num_planning_attempts(10)
     # self.move_group.set_goal_tolerance(0.1)
-    # self.move_group.set_goal_position_tolerance(0.25)
-    # self.move_group.set_goal_orientation_tolerance(0.5)
+    # self.move_group.set_goal_position_tolerance(0.07)
+    self.move_group.set_goal_orientation_tolerance(0.4)
     
     self.move_group.set_pose_target(target_pose)
 
