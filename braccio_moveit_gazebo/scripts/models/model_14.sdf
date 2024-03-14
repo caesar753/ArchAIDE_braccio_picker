@@ -1,6 +1,6 @@
 <sdf version='1.6'>     
   <model name='sherd'>
-    <pose frame=''>0.0 0.0 0.0 0 -0 1.57</pose>
+    <pose frame=''>0.0 0.0 0.0 0 -1.2679114207527131</pose>
     <link name='link'>
       <inertial>
         <mass>0.01</mass>
@@ -42,8 +42,8 @@
       <visual name='visual'>
        <geometry>
           <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://meshes/fragments/frag_1/meshes/model.stl</uri>
+            <scale>0.527 0.231 1</scale>
+            <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
           </mesh>
         </geometry>
         <material>

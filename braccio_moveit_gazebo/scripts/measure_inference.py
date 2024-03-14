@@ -30,6 +30,8 @@ from geometry_msgs.msg import Pose, Twist
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import SpawnModel
 
+# from tf.transformations import quaternion_from_euler, quaternion_about_axis, quaternion_multiply
+
 import time
 
 # def transformation(self, image):
@@ -117,10 +119,6 @@ class segmeasure():
         # if self.ROI.any():
         cv2.imwrite(os.path.join(vision_path, "segmentation/ROI_{}.png".format(self.ROI_number)), self.ROI)
 
-    def return_pippo_topolino(self):
-        # print(self.pippo, self.topolino)
-        return self.pippo, self.topolino 
-
     def position(self):
         PositionPub.print_coord(self)                          
                 
@@ -154,13 +152,6 @@ class segmeasure():
         self.confidence = round(float(confidence), 2)
         self.prediction = int(prediction)
         return self.confidence, self.prediction
-
-    # def return_center_xy(self):
-    #     # print(self.pippo, self.topolino)
-    #     return self.pippo, self.topolino 
-
-    # def print_file(self):
-    #     compl_file  = open("posizioni_completo.txt", "a")
         
         
     def position(self):
@@ -208,18 +199,23 @@ class segmeasure():
         cv2.imshow("Image", orig)
         cv2.waitKey(0)
 
-    def model_creation(self, dimA, dimB, n, class_texture):
+    def model_creation(self, dimA, dimB, n, class_texture, rot_angle):
         original = open("model.sdf",'r')
         filedata = original.read()
         original.close()
 
+        # rotation_quaternion = quaternion_from_euler(0, 0, rot_angle)
+
         new_dim = (str(np.round(dimA/1000,3)) + " " + str(np.round(dimB/1000,3)))
+        new_dim_mesh = (str(np.round(dimA/50,3)) + " " + str(np.round(dimB/50,3)))
         newdata = filedata.replace("0.02 0.02", new_dim)
         print(f"in model_creation class texture is {class_texture}")
         sherd_class = newdata.replace("TEXTUREHERE", class_texture)
+        mesh_dim = sherd_class.replace("1 1", new_dim_mesh)
+        mesh_rot = mesh_dim.replace("yaw", str(rot_angle))
 
         created = open("models/model_{}.sdf".format(n),'w+')
-        created.write(sherd_class)
+        created.write(mesh_rot)
         created.close()
 
 class PositionPub():  

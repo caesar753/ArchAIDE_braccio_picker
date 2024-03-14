@@ -11,6 +11,7 @@ from custom_msgs.msg import target, matrix
 import open3d as o3d
 
 from scipy.spatial import distance as dist
+import math
 from imutils import perspective
 from imutils import contours
 # import argparse
@@ -96,6 +97,25 @@ def main():
         # compute the rotated bounding box of the contour
         orig = segmentation.thresholded.copy()
         box = cv2.minAreaRect(c)
+
+        # get angle from rotated rectangle
+        angle = box[-1]
+
+        # from https://www.pyimagesearch.com/2017/02/20/text-skew-correction-opencv-python/
+        # the `cv2.minAreaRect` function returns values in the
+        # range [-90, 0); as the rectangle rotates clockwise the
+        # returned angle trends to 0 -- in this special case we
+        # need to add 90 degrees to the angle
+        if angle < -45:
+            angle = -(90 + angle)
+        
+        # otherwise, just take the inverse of the angle to make
+        # it positive
+        else:
+            angle = -angle
+        
+        angle = math.radians(angle)
+
         box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
         box = np.array(box, dtype="int")
         # print(f'BoxPoint are {box}')
@@ -177,7 +197,7 @@ def main():
             
             # segmentation.add_link(x_mm, y_mm)
             
-            segmentation.model_creation(dimA, dimB, n, class_sherd)
+            segmentation.model_creation(dimA, dimB, n, class_sherd, angle)
             
             RosPub.add_link(nome, n, (centX/1000), (centY/1000))
             
