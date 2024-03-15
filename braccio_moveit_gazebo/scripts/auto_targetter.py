@@ -82,6 +82,8 @@ class BraccioObjectTargetInterface(object):
     self.homography = None
 
     self.kinematics = InvKin.Arm3Link()
+
+    self.joint_start = self.move_group.get_current_joint_values()
     
 
   def linkstate_callback(self, data):
@@ -264,7 +266,8 @@ class BraccioObjectTargetInterface(object):
     # self.go_to_j(j1=1.0,j2=0.13,j3=2.29)
 
   def go_to_pick(self,):
-    self.go_to_j(j2=0.8)
+    current_joint = self.move_group.get_current_joint_values()
+    self.go_to_j(j2= current_joint[2] + 0.8)
 
   def go_to_pull(self, phi):
     self.go_to_raise()
@@ -299,10 +302,11 @@ class BraccioObjectTargetInterface(object):
       return s, [phi, np.NaN, np.NaN, np.NaN]
     return s, [phi, q[0], q[1]+np.pi/2, q[2]+np.pi/2]
 
-  def get_down_targets(self,x,y):
+  def get_down_targets(self,x,y, angle):
     s, phi = cart2pol(x,y)
     print(s, phi)
-    q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_DOWN, -np.pi/2)
+    # q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_DOWN, -np.pi/4)
+    q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_DOWN, -angle)
     xy = self.kinematics.get_xy(q)
     if np.abs(xy[0]-s) > CLOSE_ENOUGH:
       print('NO SOLUTION FOUND')
@@ -313,7 +317,7 @@ class BraccioObjectTargetInterface(object):
 
   def go_to_xy(self, x, y, r, how, bowl):
     if how=='top':
-      s, joint_targets = self.get_down_targets(x,y)
+      s, joint_targets = self.get_down_targets(x, y, np.pi/2)
       print(joint_targets)
       if joint_targets[0]<0 or joint_targets[0]>3.14:
         print('++++++ Not in reachable area, aborting ++++++')
@@ -325,7 +329,11 @@ class BraccioObjectTargetInterface(object):
       #   return -1
       if np.isnan(joint_targets[1]):
         print('++++++ Not in reachable area, aborting ++++++')
-        return -1
+        # return -1
+        s, joint_targets = self.get_down_targets(x, y, np.pi/4)
+        if np.isnan(joint_targets[1]):
+          print('++++++ Not in reachable area, aborting ++++++')
+          return -1
     # elif how=='side':
     #   s, joint_targets = self.get_targets(x,y)
     #   print(joint_targets)
@@ -411,7 +419,7 @@ class BraccioObjectTargetInterface(object):
     self.go_to_j(j0=2.355)
     self.go_to_j(j1 = 1.67, j2 = 0.10, j3 = 0.5)
     self.gripper_open()
-    self.gripper_open()
+    self.go_to_joint(self.joint_start)
 
   def go_to_home_1(self):
     # self.gripper_close()
