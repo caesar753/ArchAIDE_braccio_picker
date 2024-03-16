@@ -31,7 +31,7 @@ Z_MAX_SIDE = -0.03
 Z_MAX_DOWN = 0
 Z_MIN = -0.045
 
-CLOSE_ENOUGH = 0.02
+CLOSE_ENOUGH = 0.1
 DEFAULT_ROT = 0
 
 S_SIDE_MAX = 0.4
@@ -67,6 +67,7 @@ class BraccioObjectTargetInterface(object):
     # rospy.init_node('braccio_xy_bb_target', anonymous=True)
     self.states_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.linkstate_callback)
     self.targets_list = []
+    self.centers = matrix()
     self.i = 0
     # Subscriber to /targets topic with matrix message
     self.target_matrix = rospy.Subscriber("/targets", matrix, self.callback_matrix)
@@ -257,8 +258,8 @@ class BraccioObjectTargetInterface(object):
     self.gripper_group.stop()
 
   def go_start_position(self):
-    joint_home = [0.006390002133270123, 0.28485107225109907, 2.815086844862212, 3.0658329095147794, 0.053221123248811786]
-    self.move_group.go(joint_home)
+    # joint_home = [0.006390002133270123, 0.28485107225109907, 2.815086844862212, 3.0658329095147794, 0.053221123248811786]
+    self.move_group.go(self.joint_start)
     self.move_group.stop()
 
   def go_to_raise(self):
@@ -306,7 +307,8 @@ class BraccioObjectTargetInterface(object):
     s, phi = cart2pol(x,y)
     print(s, phi)
     # q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_DOWN, -np.pi/4)
-    q = self.kinematics.inv_kin(s, Z_MIN, Z_MAX_DOWN, -angle)
+    z_targ = 0.01
+    q = self.kinematics.inv_kin(s,  Z_MIN, Z_MAX_DOWN, -angle)
     xy = self.kinematics.get_xy(q)
     if np.abs(xy[0]-s) > CLOSE_ENOUGH:
       print('NO SOLUTION FOUND')
@@ -348,26 +350,41 @@ class BraccioObjectTargetInterface(object):
     #     print('++++++ Not in reachable area, aborting ++++++')
     #     return -1
 
+    print(f"calculated joint_targets are {joint_targets}")
+
     self.go_to_raise()
 
     self.gripper_open()
     self.go_to_j(j0=float(joint_targets[0]))
 
-    self.go_to_j(j1=float(joint_targets[1]-0.125),
-                 j2=float(joint_targets[2]),
-                 j3=float(joint_targets[3])+0.13)
+    # self.go_to_j(j1=float(joint_targets[1]-0.125),
+    #              j2=float(joint_targets[2]),
+    #              j3=float(joint_targets[3])+0.13)
 
-    self.go_to_j(j2=float(joint_targets[2]-0.08))
+    # self.go_to_j(j2=float(joint_targets[2]-0.08))
+
+    self.go_to_j(j1=float(joint_targets[1]),
+                 j2=float(joint_targets[2]),
+                 j3=float(joint_targets[3]))
+
+    # if joint_targets[2] - 0.22 > 0:
+    #   self.go_to_j(j2=float(joint_targets[2]-0.22),
+    #                j3=float(joint_targets[3]+0.15))
+    # else:
+    #   self.go_to_j(j1=float(joint_targets[1]-0.25),
+    #                j2= 0.0)
     
     # self.go_to_j(j3=float(joint_targets[3])+0.125)
 
-    self.gripper_close()
+    # self.gripper_close()
+
     # if how=='top' and joint_targets[2]<3:
     #   self.go_to_j(j2=float(joint_targets[2])+0.1)
     # self.go_to_home()
-    home_ch = getattr(self, bowl)
-    home_ch()
-    return 0
+    
+    # home_ch = getattr(self, bowl)
+    # home_ch()
+    # return 0
 
   def go_to_manual_joint(self):
     joint_goal = self.move_group.get_current_joint_values()
@@ -413,16 +430,16 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_0(self):
-    # self.gripper_close()
+    self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=2.355)
     self.go_to_j(j1 = 1.67, j2 = 0.10, j3 = 0.5)
     self.gripper_open()
-    self.go_to_joint(self.joint_start)
+    # self.go_to_joint(self.joint_start)
 
   def go_to_home_1(self):
-    # self.gripper_close()
+    self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=0.785)
@@ -431,7 +448,7 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_2(self):
-    # self.gripper_close()
+    self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0 = 2.355)
@@ -462,6 +479,8 @@ class BraccioObjectTargetInterface(object):
   #method to subscribe to the matrix message where sherds and homes are published
   def callback_matrix(self,msg):
         # rospy.loginfo(msg)
+    self.centers = msg.targets
+
     for i in range(len(msg.targets)):
         # print(i)
         # print(msg.targets[i])
@@ -470,4 +489,4 @@ class BraccioObjectTargetInterface(object):
 
   #method to get the targets outside the callback_matrix method
   def return_targets(self):
-    return(self.i, self.targets_list)
+    return(self.i, self.targets_list, self.centers)

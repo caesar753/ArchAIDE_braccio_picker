@@ -1,6 +1,6 @@
 <sdf version='1.6'>     
   <model name='sherd'>
-    <pose frame=''>0.0 0.0 0.0 0 -0.11065722283572099</pose>
+    <pose frame=''>0.0 0.0 0.0 0 0.11065722283572099</pose>
     <link name='link'>
       <inertial>
         <mass>0.01</mass>

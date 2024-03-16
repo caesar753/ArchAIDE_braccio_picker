@@ -68,6 +68,12 @@ if __name__ == '__main__':
         
         hand_tf = vision_utils.get_hand_tf()
 
+        pippo = pcl_o3d.get_center()
+        print(pippo)
+        print(type(pippo))
+        print(pippo.shape)
+        print(type(hand_tf))
+        print(hand_tf.shape)
 
         initial_pose = np.concatenate((pcl_o3d.get_center(), hand_tf))
         initial_pose = vision_utils.get_pose_from_arr(initial_pose)

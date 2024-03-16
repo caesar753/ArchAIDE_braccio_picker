@@ -241,7 +241,7 @@ class BraccioPoseGoal(object):
     self.move_group.set_num_planning_attempts(10)
     # self.move_group.set_goal_tolerance(0.1)
     # self.move_group.set_goal_position_tolerance(0.07)
-    self.move_group.set_goal_orientation_tolerance(0.4)
+    self.move_group.set_goal_orientation_tolerance(0.2)
     
     self.move_group.set_pose_target(target_pose)
 

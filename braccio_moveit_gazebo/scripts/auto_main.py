@@ -114,7 +114,7 @@ def main():
         else:
             angle = -angle
         
-        angle = math.radians(angle)
+        angle = np.abs(math.radians(angle))
 
         box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
         box = np.array(box, dtype="int")
@@ -275,7 +275,7 @@ def main():
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
-            lk = (posizioni[i, 0].astype(int), posizioni[i,4], np.array2string(np.where([groups==posizioni[i,0]])[1]))
+            lk = (posizioni[i, 0].astype(int), posizioni[i, 2].astype(float), posizioni[i, 3].astype(float), posizioni[i,4], np.array2string(np.where([groups==posizioni[i,0]])[1]))
             print(lk)
             # print(np.where([groups==posizioni[i,0]])[0].astype(int))
             link_choose.append(lk)
@@ -311,10 +311,13 @@ def main():
         #Generating the target message, fields are: nr[int], sherd[str], home[str]
         target_msg = target()
         target_msg.nr = j
-        inp_ch = link_array[j,1].astype(str) + "::link"
+        inp_ch = link_array[j,3].astype(str) + "::link"
         print(inp_ch)
         target_msg.sherd = inp_ch
-        bowl_ch = link_array[j,2].astype(str)
+        cent_x = link_array[j,1].astype(float)
+        cent_y = link_array[j,2].astype(float)
+        target_msg.center = [cent_x, cent_y]
+        bowl_ch = link_array[j,4].astype(str)
         bowl_ch = bowl_ch.replace('\'','').replace('\'','')
         bowl_ch = bowl_ch.replace('[','').replace(']','')
         bowl_ch = "go_to_home_" + bowl_ch
