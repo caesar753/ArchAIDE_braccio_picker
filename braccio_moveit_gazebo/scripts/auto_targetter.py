@@ -67,6 +67,7 @@ class BraccioObjectTargetInterface(object):
     # rospy.init_node('braccio_xy_bb_target', anonymous=True)
     self.states_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.linkstate_callback)
     self.targets_list = []
+    self.sherds = matrix()
     self.i = 0
     # Subscriber to /targets topic with matrix message
     self.target_matrix = rospy.Subscriber("/targets", matrix, self.callback_matrix)
@@ -454,6 +455,7 @@ class BraccioObjectTargetInterface(object):
   #method to subscribe to the matrix message where sherds and homes are published
   def callback_matrix(self,msg):
         # rospy.loginfo(msg)
+    self.sherds = msg.targets
     for i in range(len(msg.targets)):
         # print(i)
         # print(msg.targets[i])
@@ -462,4 +464,4 @@ class BraccioObjectTargetInterface(object):
 
   #method to get the targets outside the callback_matrix method
   def return_targets(self):
-    return(self.i, self.targets_list)
+    return(self.i, self.targets_list, self.sherds)
