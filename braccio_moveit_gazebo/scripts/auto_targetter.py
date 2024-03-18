@@ -242,9 +242,10 @@ class BraccioObjectTargetInterface(object):
     self.move_group.stop()
 
   def gripper_close(self):
-    self.go_gripper(1.175)
+    self.go_gripper(1.16)
 
   def gripper_open(self):
+    # self.go_gripper(0.9)
     self.go_gripper(0.9)
 
   def gripper_middle(self):
@@ -317,7 +318,7 @@ class BraccioObjectTargetInterface(object):
       return s, [phi, np.NaN, np.NaN, np.NaN]
     return s, [phi, q[0], q[1]+np.pi/2, q[2]+np.pi/2]
 
-  def go_to_xy(self, x, y, r, how, bowl):
+  def go_to_xy(self, x, y, r, how):
     if how=='top':
       s, joint_targets = self.get_down_targets(x, y, np.pi/2)
       print(joint_targets)
@@ -413,10 +414,10 @@ class BraccioObjectTargetInterface(object):
         v = float(tst)
     self.go_gripper(v)
 
-  def go_to_target(self, how, bowl, lk):
+  def go_to_target(self, how, lk):
     x,y,r = self.get_box_position(lk)
     print(x, y, r)
-    return self.go_to_xy(x, y, r, how, bowl)
+    return self.go_to_xy(x, y, r, how)
   
   # def go_link_choose(self, lk):
   #     self.link_choose = lk
@@ -490,3 +491,8 @@ class BraccioObjectTargetInterface(object):
   #method to get the targets outside the callback_matrix method
   def return_targets(self):
     return(self.i, self.targets_list, self.centers)
+  
+  def transform_home(self, bowl):
+    home_ch = getattr(self, bowl)
+    home_ch()
+    # return 0

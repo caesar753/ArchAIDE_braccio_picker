@@ -388,7 +388,7 @@
     
     <!-- Fake joint and link for grasping -->
     <joint name="braccio_grasp_joint" type="continuous">
-        <origin rpy="0 0 0.0" xyz="0.0 0.0 0.04"/>
+        <origin rpy="0 0 0.0" xyz="0.0 0.0 0.115"/>
         <parent link="link_5" />
         <child link="arm_grasp_link" />
     </joint>
@@ -413,7 +413,7 @@
 
     <!-- Fake joint and link for gripper grasping -->
     <joint name="gripper_grasp_joint" type="fixed">
-        <origin rpy="0 0 0.0" xyz="0.00 0.0 0.09"/>
+        <origin rpy="0 0 0.0" xyz="0.00 0.0 0.015"/>
         <parent link="arm_grasp_link" />
         <child link="central_gripper_link" />
     </joint>

@@ -99,7 +99,7 @@ if __name__ == '__main__':
     # hand_pose_world_np[1] -= 0.035
     # # hand_pose_world_np[2] = 1.15 + 0.15
     # hand_pose_world_np[2] += 0.025
-    hand_pose_world_np[2] -= 0.01
+    hand_pose_world_np[2] -= 0.002
     # hand_pose_world_np[3:] = hand_tf
 
     hand_pose_world_quaternion = hand_pose_world_np[3:]
@@ -115,6 +115,8 @@ if __name__ == '__main__':
     
     print(f"final hand_pose_world_np is {hand_pose_world_np}")
 
+    
+    gripper_grasp_pose = vision_utils.get_pose_from_arr(hand_pose_world_np)
     vision_utils.publish_tf_np(hand_pose_world_np, child_frame='gripper_grasp_pose')
 
     hand_pose_world_np[3:] = np.roll(hand_pose_world_np[3:], 1)
@@ -128,7 +130,7 @@ if __name__ == '__main__':
 
     # arm_target_pose_np = vision_utils.get_arr_from_pose(arm_target_pose)
     vision_utils.publish_tf_np(arm_target_pose_np, child_frame='arm_grasp_pose')
-    arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
+    # arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
     arm_target_pose = vision_utils.get_pose_from_arr(arm_target_pose_np)
 
 
