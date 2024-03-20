@@ -242,14 +242,14 @@ class BraccioObjectTargetInterface(object):
     self.move_group.stop()
 
   def gripper_close(self):
-    self.go_gripper(1.16)
+    self.go_gripper(1.15)
 
   def gripper_open(self):
     # self.go_gripper(0.9)
     self.go_gripper(0.9)
 
   def gripper_middle(self):
-    self.go_gripper(1.05)
+    self.go_gripper(1.09)
 
   def go_gripper(self, val):
     joint_goal = self.gripper_group.get_current_joint_values()
@@ -333,23 +333,24 @@ class BraccioObjectTargetInterface(object):
       if np.isnan(joint_targets[1]):
         print('++++++ Not in reachable area, aborting ++++++')
         # return -1
-        s, joint_targets = self.get_down_targets(x, y, np.pi/4)
+        s, joint_targets = self.get_down_targets(x, y, np.pi/3)
         if np.isnan(joint_targets[1]):
           print('++++++ Not in reachable area, aborting ++++++')
           return -1
-    # elif how=='side':
-    #   s, joint_targets = self.get_targets(x,y)
-    #   print(joint_targets)
-    #   if joint_targets[0]<0 or joint_targets[0]>3.14:
-    #     print('++++++ Not in reachable area, aborting ++++++')
-    #     return -1
-    #   if np.isnan(joint_targets[1]) and s < S_SIDE_MAX and s > S_SIDE_MIN:
-    #     print('++++++ Too close, pushing backwards +++++')
-    #     self.go_to_push(joint_targets[0])
-    #     return 1
-    #   if np.isnan(joint_targets[1]):
-    #     print('++++++ Not in reachable area, aborting ++++++')
-    #     return -1
+    elif how=='side':
+        print("FROM SIDE")
+        s, joint_targets = self.get_targets(x,y)
+        print(joint_targets)
+        if joint_targets[0]<0 or joint_targets[0]>3.14:
+          print('++++++ Not in reachable area, aborting ++++++')
+          return -1
+        if np.isnan(joint_targets[1]) and s < S_SIDE_MAX and s > S_SIDE_MIN:
+          print('++++++ Too close, pushing backwards +++++')
+          self.go_to_push(joint_targets[0])
+          return 1
+        if np.isnan(joint_targets[1]):
+          print('++++++ Not in reachable area, aborting ++++++')
+          return -1
 
     print(f"calculated joint_targets are {joint_targets}")
 
@@ -430,8 +431,11 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
     self.gripper_open()
 
-  def go_to_home_0(self):
-    self.gripper_close()
+  def go_to_home_0(self, dim):
+    if dim > 40:
+      self.gripper_middle()
+    else:
+      self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=2.355)
@@ -439,8 +443,11 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
     # self.go_to_joint(self.joint_start)
 
-  def go_to_home_1(self):
-    self.gripper_close()
+  def go_to_home_1(self, dim):
+    if dim > 40:
+      self.gripper_middle()
+    else:
+      self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=0.785)
@@ -448,8 +455,11 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
     self.gripper_open()
 
-  def go_to_home_2(self):
-    self.gripper_close()
+  def go_to_home_2(self, dim):
+    if dim > 40:
+      self.gripper_middle()
+    else:
+      self.gripper_close()
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0 = 2.355)
@@ -481,6 +491,7 @@ class BraccioObjectTargetInterface(object):
   def callback_matrix(self,msg):
         # rospy.loginfo(msg)
     self.centers = msg.targets
+    # self.dim = msg.dimension
 
     for i in range(len(msg.targets)):
         # print(i)
@@ -492,7 +503,7 @@ class BraccioObjectTargetInterface(object):
   def return_targets(self):
     return(self.i, self.targets_list, self.centers)
   
-  def transform_home(self, bowl):
+  def transform_home(self, bowl, dim):
     home_ch = getattr(self, bowl)
-    home_ch()
+    home_ch(dim)
     # return 0

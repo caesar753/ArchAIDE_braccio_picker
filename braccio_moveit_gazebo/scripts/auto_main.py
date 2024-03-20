@@ -192,7 +192,10 @@ def main():
             x_mm = repr(round(centX,2))
             y_mm = repr(round(centY,2))
             nome = ("sherd_" + str(n))
-            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + "\n")
+            dim_x = repr(round(dimA,2))
+            dim_y = repr(round(dimB,2))
+            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + " " + \
+                dim_x + " " + dim_y + "\n")
             position_mm.close()
             
             # segmentation.add_link(x_mm, y_mm)
@@ -265,7 +268,6 @@ def main():
 
     choosen_file = os.path.join(vision_path, "choosen.txt")
     # os.chdir(vision_path)
-    # with open (os.path.join(vision_path, "cazzo.txt")) as g:
     with open (choosen_file) as g:
         groups = np.array([[x for x in line.split()] for line in g])
         print(groups)
@@ -275,7 +277,13 @@ def main():
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
-            lk = (posizioni[i, 0].astype(int), posizioni[i, 2].astype(float), posizioni[i, 3].astype(float), posizioni[i,4], np.array2string(np.where([groups==posizioni[i,0]])[1]))
+            lk = (posizioni[i, 0].astype(int), 
+                    posizioni[i, 2].astype(float), 
+                    posizioni[i, 3].astype(float), 
+                    posizioni[i,4], 
+                    posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
+                    # posizioni[i,5],
+                    np.array2string(np.where([groups==posizioni[i,0]])[1]))
             print(lk)
             # print(np.where([groups==posizioni[i,0]])[0].astype(int))
             link_choose.append(lk)
@@ -310,19 +318,28 @@ def main():
     for j in range(len(link_array)):
         #Generating the target message, fields are: nr[int], sherd[str], home[str]
         target_msg = target()
+        
         target_msg.nr = j
+        
         inp_ch = link_array[j,3].astype(str) + "::link"
         print(inp_ch)
         target_msg.sherd = inp_ch
+
         cent_x = link_array[j,1].astype(float)
         cent_y = link_array[j,2].astype(float)
         target_msg.center = [cent_x, cent_y]
-        bowl_ch = link_array[j,4].astype(str)
+        
+        bowl_ch = link_array[j,5].astype(str)
         bowl_ch = bowl_ch.replace('\'','').replace('\'','')
         bowl_ch = bowl_ch.replace('[','').replace(']','')
         bowl_ch = "go_to_home_" + bowl_ch
         print(bowl_ch)
         target_msg.home = bowl_ch
+
+        dim = link_array[j,4].astype(float)
+        print(f'dim is {dim}')
+        target_msg.dimension = dim
+        
         #Appending the target message to the list
         target_msg_arr.append(target_msg)
     
