@@ -272,7 +272,7 @@ class BraccioPoseGoal(object):
     # hand_pose_world_np[1] -= 0.0025
     # # hand_pose_world_np[2] = 1.15 + 0.15
     # hand_pose_world_np[2] += 0.025
-    hand_pose_world_np[2] += 0.0005
+    hand_pose_world_np[2] += 0.0025
     # hand_pose_world_np[3:] = hand_tf
 
     hand_pose_world_quaternion = hand_pose_world_np[3:]

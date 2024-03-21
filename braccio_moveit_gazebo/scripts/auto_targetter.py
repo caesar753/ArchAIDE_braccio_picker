@@ -218,7 +218,7 @@ class BraccioObjectTargetInterface(object):
       print('calibration.json not in current directory, run calibration first')
       self.calibrate()
 
-  def go_to_j(self, j0=None, j1=None, j2=None, j3=None):
+  def go_to_j(self, j0=None, j1=None, j2=None, j3=None, j4 = None):
     """update arm joints"""
     joint_goal = self.move_group.get_current_joint_values()
     if j0 is not None:
@@ -229,6 +229,8 @@ class BraccioObjectTargetInterface(object):
       joint_goal[2]=j2
     if j3 is not None:
       joint_goal[3]=j3
+    if j4 is not None:
+      joint_goal[4] = j4
     self.go_to_joint(joint_goal)
 
   def go_to_joint(self, joint_targets):
@@ -237,19 +239,28 @@ class BraccioObjectTargetInterface(object):
     joint_goal[1] = joint_targets[1]
     joint_goal[2] = joint_targets[2]
     joint_goal[3] = joint_targets[3]
-    joint_goal[4] = 1.5708
+    if joint_targets[4] is not None:
+      joint_goal[4] = joint_targets[4]
+    else:
+      joint_goal[4] = 1.5708
     ret = self.move_group.go(joint_goal, wait=True)
     self.move_group.stop()
 
   def gripper_close(self):
-    self.go_gripper(1.175)
+    self.go_gripper(1.15)
 
   def gripper_open(self):
-    # self.go_gripper(0.9)
-    self.go_gripper(0.9)
+    self.go_gripper(0.8)
+    # self.go_gripper(1.01)
 
   def gripper_middle(self):
-    self.go_gripper(1.11)
+    self.go_gripper(1.09)
+  
+  def gripper_float(self, dim):
+    # strenght = -0.0045 * dim + 1.35
+    strenght = -0.0045 * dim + 1.335
+    rospy.loginfo("strenght of grasp is " + str(strenght))
+    self.go_gripper(strenght)
 
   def go_gripper(self, val):
     joint_goal = self.gripper_group.get_current_joint_values()
@@ -365,9 +376,10 @@ class BraccioObjectTargetInterface(object):
 
     # self.go_to_j(j2=float(joint_targets[2]-0.08))
 
-    self.go_to_j(j1=float(joint_targets[1]),
-                 j2=float(joint_targets[2]),
-                 j3=float(joint_targets[3]))
+    # self.go_to_j(j1=float(joint_targets[1]),
+    #              j2=float(joint_targets[2]))#,
+                #  j3=float(joint_targets[3]))
+                # j3 = 0.00)
 
     # if joint_targets[2] - 0.22 > 0:
     #   self.go_to_j(j2=float(joint_targets[2]-0.22),
@@ -432,10 +444,13 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_0(self, dim):
-    if dim > 40:
-      self.gripper_middle()
-    else:
-      self.gripper_close()
+    # if dim > 35:
+    #   self.gripper_middle()
+    # else:
+    #   self.gripper_close()
+
+    self.gripper_float(dim)
+
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=2.355)
@@ -444,10 +459,13 @@ class BraccioObjectTargetInterface(object):
     # self.go_to_joint(self.joint_start)
 
   def go_to_home_1(self, dim):
-    if dim > 40:
-      self.gripper_middle()
-    else:
-      self.gripper_close()
+    # if dim > 35:
+    #   self.gripper_middle()
+    # else:
+    #   self.gripper_close()
+    
+    self.gripper_float(dim)
+    
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=0.785)
@@ -456,10 +474,13 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_2(self, dim):
-    if dim > 40:
-      self.gripper_middle()
-    else:
-      self.gripper_close()
+    # if dim > 35:
+    #   self.gripper_middle()
+    # else:
+    #   self.gripper_close()
+
+    self.gripper_float(dim)
+
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0 = 2.355)
@@ -504,6 +525,7 @@ class BraccioObjectTargetInterface(object):
     return(self.i, self.targets_list, self.centers)
   
   def transform_home(self, bowl, dim):
+    self.go_to_j(j4 = 1.5708)
     home_ch = getattr(self, bowl)
     home_ch(dim)
     # return 0

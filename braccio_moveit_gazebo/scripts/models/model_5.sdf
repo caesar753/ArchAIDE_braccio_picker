@@ -2,16 +2,16 @@
   <model name='sherd'>
     <pose frame=''>0.0 0.0 0.02 0 0 1.0636978315204562</pose>
     <link name='link'>
-      <pose>0 0 0.0 0.0 0.0 0</pose>
+      <pose>0.0 0.0 0.005 0.0 0.0 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
-          <ixx>0.000000582</ixx>
-          <ixy>0.000000052</ixy>
-          <ixz>0.000000008</ixz>
-          <iyy>0.000000558</iyy>
-          <iyz>-0.000000007</iyz>
-          <izz>0.000001046</izz>
+          <ixx>0.00000582</ixx>
+          <ixy>0.00000052</ixy>
+          <ixz>0.00000008</ixz>
+          <iyy>0.00000558</iyy>
+          <iyz>-0.00000007</iyz>
+          <izz>0.00001046</izz>
         </inertia>
       </inertial>
       <collision name='collision'>
