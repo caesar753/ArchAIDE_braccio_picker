@@ -2,7 +2,7 @@
   <model name='sherd'>
     <pose frame=''>0.0 0.0 0.02 0 0 0.19335789548357837</pose>
     <link name='link'>
-      <pose>0.0 0.0 0.005 0.0 0.0 0</pose>
+      <pose>0.0 0.0 0.01 0.0 0.0 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
