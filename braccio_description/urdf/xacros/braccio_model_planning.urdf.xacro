@@ -153,6 +153,17 @@
             <geometry>
                 <mesh filename="package://braccio_description/stl/braccio_left_gripper.stl" scale="0.001 0.001 0.001" />
             </geometry>
+            <surface>
+                <friction>
+                    <ode>
+                    <mu>2000</mu>
+                    <mu2>1000</mu2>
+                    </ode>
+                    <torsional>
+                    <ode/>
+                    </torsional>
+                </friction>
+            </surface>
         </collision>
     </link>
     <link name="right_gripper_link">
@@ -175,6 +186,17 @@
             <geometry>
                 <mesh filename="package://braccio_description/stl/braccio_right_gripper.stl" scale="0.001 0.001 0.001" />
             </geometry>
+            <surface>
+                <friction>
+                    <ode>
+                    <mu>2000</mu>
+                    <mu2>1000</mu2>
+                    </ode>
+                    <torsional>
+                    <ode/>
+                    </torsional>
+                </friction>
+            </surface>
         </collision>
     </link>
 

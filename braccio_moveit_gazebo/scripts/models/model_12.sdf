@@ -1,23 +1,25 @@
 <sdf version='1.6'>     
   <model name='sherd'>
-    <pose frame=''>0.0 0.0 0.0 0 1.5707963267948966</pose>
+    <pose frame=''>0.0 0.0 0.02 0 0 1.5707963267948966</pose>
     <link name='link'>
+      <pose>0 0 0.0 0.0 0.0 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
-          <ixx>0.000166667</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166667</iyy>
-          <iyz>0</iyz>
-          <izz>0.000166667</izz>
+          <ixx>0.000000582</ixx>
+          <ixy>0.000000052</ixy>
+          <ixz>0.000000008</ixz>
+          <iyy>0.000000558</iyy>
+          <iyz>-0.000000007</iyz>
+          <izz>0.000001046</izz>
         </inertia>
       </inertial>
       <collision name='collision'>
         <geometry>
-          <box>
-            <size>0.026 0.035 0.01</size>
-          </box>
+          <mesh>
+            <scale>0.52 0.705 1</scale>
+            <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
+          </mesh>
         </geometry>
         <max_contacts>10</max_contacts>
         <surface>

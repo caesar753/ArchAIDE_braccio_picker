@@ -241,7 +241,7 @@ class BraccioPoseGoal(object):
     except ValueError:
       pass
 
-  def create_tf(self, sherd_center):
+  def create_tf(self, sherd_center, quat_x = 0.0, quat_y = 0.0, quat_z = 0.0):
     tf_hand = vision_utils.get_transform(parent_frame="central_gripper_link",\
                                                     child_frame="arm_grasp_link")
     # print (tf)
@@ -268,17 +268,17 @@ class BraccioPoseGoal(object):
 
     hand_pose_world_np = vision_utils.get_arr_from_pose(initial_pose)
     
-    hand_pose_world_np[0] -= 0.005
-    hand_pose_world_np[1] -= 0.005
+    # hand_pose_world_np[0] -= 0.0025
+    # hand_pose_world_np[1] -= 0.0025
     # # hand_pose_world_np[2] = 1.15 + 0.15
     # hand_pose_world_np[2] += 0.025
-    hand_pose_world_np[2] -= 0.001
+    hand_pose_world_np[2] += 0.0005
     # hand_pose_world_np[3:] = hand_tf
 
     hand_pose_world_quaternion = hand_pose_world_np[3:]
     print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
 
-    rotation_quaternion = quaternion_from_euler(-0.39, 0, 2.32)
+    rotation_quaternion = quaternion_from_euler(quat_x, quat_y, quat_z)
 
     hand_pose_world_quaternion = quaternion_multiply(rotation_quaternion, hand_pose_world_quaternion)
     
@@ -309,7 +309,7 @@ class BraccioPoseGoal(object):
 
     pose_start = self.move_group.get_current_pose()
 
-    self.move_group.set_planning_time(20)
+    self.move_group.set_planning_time(5)
     self.move_group.set_num_planning_attempts(10)
     # self.move_group.set_goal_tolerance(0.1)
     self.move_group.set_goal_position_tolerance(0.007)
@@ -330,7 +330,7 @@ class BraccioPoseGoal(object):
     _, plan, _, _ = self.move_group.plan()
 
     #execute plan
-    self.move_group.execute(plan)
+    self.move_group.execute(plan, wait = True)
 
     display_trajectory = moveit_msgs.msg.DisplayTrajectory()
     display_trajectory.trajectory_start = self.robot.get_current_state()

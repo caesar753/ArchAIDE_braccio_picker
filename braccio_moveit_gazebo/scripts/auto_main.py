@@ -281,8 +281,8 @@ def main():
                     posizioni[i, 2].astype(float), 
                     posizioni[i, 3].astype(float), 
                     posizioni[i,4], 
-                    posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
-                    # posizioni[i,5],
+                    # posizioni[i,5] if posizioni[i,5] <= posizioni[i,6] else posizioni[i,6], 
+                    posizioni[i,6],
                     np.array2string(np.where([groups==posizioni[i,0]])[1]))
             print(lk)
             # print(np.where([groups==posizioni[i,0]])[0].astype(int))

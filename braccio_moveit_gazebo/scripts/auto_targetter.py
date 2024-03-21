@@ -242,14 +242,14 @@ class BraccioObjectTargetInterface(object):
     self.move_group.stop()
 
   def gripper_close(self):
-    self.go_gripper(1.15)
+    self.go_gripper(1.175)
 
   def gripper_open(self):
     # self.go_gripper(0.9)
     self.go_gripper(0.9)
 
   def gripper_middle(self):
-    self.go_gripper(1.09)
+    self.go_gripper(1.11)
 
   def go_gripper(self, val):
     joint_goal = self.gripper_group.get_current_joint_values()

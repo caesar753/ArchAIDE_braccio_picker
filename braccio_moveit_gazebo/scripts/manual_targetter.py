@@ -44,7 +44,7 @@ if __name__ == '__main__':
     print(type(chosen[0]))
     print(chosen.shape)
 
-    add_zero = np.array([0.000])
+    add_zero = np.array([0.005])
 
     new_chos = np.concatenate((chosen, add_zero))
     print(new_chos)
@@ -64,12 +64,19 @@ if __name__ == '__main__':
 
     chosen_dimension = sherds[int(sherd_ch)].dimension
     
-    pose_targetter.create_tf(new_chos)
+    pose_targetter.create_tf(new_chos, quat_z = 1.50)
+    # pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)
 
     targetter.go_to_target('top', chosen_name)
 
     # targetter.go_start_position()
 
-    pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
+    success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
 
-    targetter.go_to_home_0(chosen_dimension)
+    if not success:
+        pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)
+    #     pose_targetter.create_tf(new_chos, quat_z = 2.32)
+        success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
+
+    if success:
+        targetter.transform_home(chosen_bowl, chosen_dimension)
