@@ -11,6 +11,7 @@ from custom_msgs.msg import target, matrix
 import open3d as o3d
 
 from scipy.spatial import distance as dist
+import math
 from imutils import perspective
 from imutils import contours
 # import argparse
@@ -42,6 +43,8 @@ from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import SpawnModel
 
 import time
+
+
 
 # auto_targetter = auto_targetter.BraccioObjectTargetInterface()
 
@@ -94,6 +97,25 @@ def main():
         # compute the rotated bounding box of the contour
         orig = segmentation.thresholded.copy()
         box = cv2.minAreaRect(c)
+
+        # get angle from rotated rectangle
+        angle = box[-1]
+
+        # from https://www.pyimagesearch.com/2017/02/20/text-skew-correction-opencv-python/
+        # the `cv2.minAreaRect` function returns values in the
+        # range [-90, 0); as the rectangle rotates clockwise the
+        # returned angle trends to 0 -- in this special case we
+        # need to add 90 degrees to the angle
+        if angle < -45:
+            angle = -(90 + angle)
+        
+        # otherwise, just take the inverse of the angle to make
+        # it positive
+        else:
+            angle = -angle
+        
+        angle = np.abs(math.radians(angle))
+
         box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
         box = np.array(box, dtype="int")
         # print(f'BoxPoint are {box}')
@@ -103,8 +125,8 @@ def main():
         #Store extreme coordinates of the box
         x_min, y_min = np.amin(box[:,0]), np.amin(box[:,1])
         x_max, y_max = np.amax(box[:,0]), np.amax(box[:,1])
-        # print(f'x_min is {x_min}, x_max is {x_max}')
-        # print(f'y_min is {y_min}, y_max is {y_max}')
+        print(f'x_min is {x_min}, x_max is {x_max}')
+        print(f'y_min is {y_min}, y_max is {y_max}')
 
         box = perspective.order_points(box)
 
@@ -116,7 +138,10 @@ def main():
         (trX, trY) = tr
         (brX, brY) = br
         (blX, blY) = bl
-        # print((tl, tr, br, bl))
+        print(f'Top left is {(tlX, tlY)},\
+            Top right is {(trX,trY)},\
+            Bottom right is {(brX,brY)},\
+            Bottom left is {(blX,blY)})')
         (tltrX, tltrY) = segmentation.midpoint(tl, tr)
         (blbrX, blbrY) = segmentation.midpoint(bl, br)
         # compute the midpoint between the top-left and top-right points,
@@ -167,12 +192,15 @@ def main():
             x_mm = repr(round(centX,2))
             y_mm = repr(round(centY,2))
             nome = ("sherd_" + str(n))
-            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + "\n")
+            dim_x = repr(round(dimA,2))
+            dim_y = repr(round(dimB,2))
+            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + " " + \
+                dim_x + " " + dim_y + "\n")
             position_mm.close()
             
             # segmentation.add_link(x_mm, y_mm)
             
-            segmentation.model_creation(dimA, dimB, n, class_sherd)
+            segmentation.model_creation(dimA, dimB, n, class_sherd, angle)
             
             RosPub.add_link(nome, n, (centX/1000), (centY/1000))
             
@@ -240,7 +268,6 @@ def main():
 
     choosen_file = os.path.join(vision_path, "choosen.txt")
     # os.chdir(vision_path)
-    # with open (os.path.join(vision_path, "cazzo.txt")) as g:
     with open (choosen_file) as g:
         groups = np.array([[x for x in line.split()] for line in g])
         print(groups)
@@ -250,7 +277,13 @@ def main():
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
-            lk = (posizioni[i, 0].astype(int), posizioni[i,4], np.array2string(np.where([groups==posizioni[i,0]])[1]))
+            lk = (posizioni[i, 0].astype(int), 
+                    posizioni[i, 2].astype(float), 
+                    posizioni[i, 3].astype(float), 
+                    posizioni[i,4], 
+                    posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
+                    # posizioni[i,6],
+                    np.array2string(np.where([groups==posizioni[i,0]])[1]))
             print(lk)
             # print(np.where([groups==posizioni[i,0]])[0].astype(int))
             link_choose.append(lk)
@@ -277,6 +310,7 @@ def main():
     #     o3d.visualization.draw_geometries([table_cloud, object_cloud])
     ###POINTCLOUD SEGMENTATION - END ###
 
+    
     #HERE WE USE CUSTOM TARGET AND MATRIX MESSAGES
     # List with the target messages
     target_msg_arr = []
@@ -284,16 +318,28 @@ def main():
     for j in range(len(link_array)):
         #Generating the target message, fields are: nr[int], sherd[str], home[str]
         target_msg = target()
+        
         target_msg.nr = j
-        inp_ch = link_array[j,1].astype(str) + "::link"
+        
+        inp_ch = link_array[j,3].astype(str) + "::link"
         print(inp_ch)
         target_msg.sherd = inp_ch
-        bowl_ch = link_array[j,2].astype(str)
+
+        cent_x = link_array[j,1].astype(float)
+        cent_y = link_array[j,2].astype(float)
+        target_msg.center = [cent_x, cent_y]
+        
+        bowl_ch = link_array[j,5].astype(str)
         bowl_ch = bowl_ch.replace('\'','').replace('\'','')
         bowl_ch = bowl_ch.replace('[','').replace(']','')
         bowl_ch = "go_to_home_" + bowl_ch
         print(bowl_ch)
         target_msg.home = bowl_ch
+
+        dim = link_array[j,4].astype(float)
+        print(f'dim is {dim}')
+        target_msg.dimension = dim
+        
         #Appending the target message to the list
         target_msg_arr.append(target_msg)
     

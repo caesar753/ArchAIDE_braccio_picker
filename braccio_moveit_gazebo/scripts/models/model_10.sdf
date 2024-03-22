@@ -1,30 +1,32 @@
 <sdf version='1.6'>     
   <model name='sherd'>
-    <pose frame=''>0.0 0.0 0.0 0 -0 1.57</pose>
+    <pose frame=''>0.0 0.0 0.02 0 0 0.7133581245931782</pose>
     <link name='link'>
+      <pose>0.0 0.0 0.01 0.0 0.0 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
-          <ixx>0.000166667</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166667</iyy>
-          <iyz>0</iyz>
-          <izz>0.000166667</izz>
+          <ixx>0.00000582</ixx>
+          <ixy>0.00000052</ixy>
+          <ixz>0.00000008</ixz>
+          <iyy>0.00000558</iyy>
+          <iyz>-0.00000007</iyz>
+          <izz>0.00001046</izz>
         </inertia>
       </inertial>
       <collision name='collision'>
         <geometry>
-          <box>
-            <size>0.034 0.047 0.01</size>
-          </box>
+          <mesh>
+            <scale>0.684 0.947 1</scale>
+            <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
+          </mesh>
         </geometry>
         <max_contacts>10</max_contacts>
         <surface>
           <friction>
             <ode>
-              <mu>200</mu>
-              <mu2>100</mu2>
+              <mu>2000</mu>
+              <mu2>1000</mu2>
             </ode>
             <torsional>
               <ode/>
@@ -42,8 +44,8 @@
       <visual name='visual'>
        <geometry>
           <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://meshes/fragments/frag_1/meshes/model.stl</uri>
+            <scale>0.684 0.947 1</scale>
+            <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
           </mesh>
         </geometry>
         <material>

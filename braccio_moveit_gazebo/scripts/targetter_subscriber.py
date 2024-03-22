@@ -17,10 +17,14 @@ if __name__ == '__main__':
 
 
     try:
-        for j in range(len(targetter.sherds)):
-            targetter.go_to_target('top',targetter.sherds[j].home, targetter.sherds[j].sherd)
+        for j in range(targetter.i+1):
+            # targetter.get_link_choose(targetter.targets_list[j].sherd)
+            targetter.go_to_target('top', targetter.targets_list[j].home, targetter.targets_list[j].sherd)
+            
+            targetter.go_start_position()
         
     except KeyboardInterrupt:
     # User interrupt the program with ctrl+c
+        targetter.go_start_position()
         print("Got Ctrl-c: shutting down processes")
         exit()

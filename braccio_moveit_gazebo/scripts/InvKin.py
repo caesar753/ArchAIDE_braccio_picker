@@ -24,6 +24,8 @@ class Arm3Link:
         self.max_angles = [1.6, np.pi/2, np.pi/2]
         self.min_angles = [0.27, -np.pi/2, -np.pi/2]
 
+    #method to calculate the x and y coordinates of the end effector (wrist) 
+    #given the joint angles (q) using trigonometric equations.
     def get_xy(self, q=None):
         if q is None:
             q = self.q
@@ -38,32 +40,41 @@ class Arm3Link:
 
         return [x, y]
 
+    # method to perform inverse kinematics to calculate the joint angles required 
+    # to reach a given x-coordinate
     def inv_kin(self, x, min_y, max_y, end_angle):
 
+        # method to calculate the difference between the desired x-coordinate 
+        #and the current x-coordinate of the end effector.
         def distance_to_default(q, x):
             x = (self.L[0]*np.cos(q[0]) + self.L[1]*np.cos(q[0]+q[1]) +
                  self.L[2]*np.cos(np.sum(q))) - x
             return x**2
 
+        # methods to ensure that the y-coordinate of the end effector lies within specified bounds
         def y_upper_constraint(q, *args):
             y = (self.L[0]*np.sin(q[0]) + self.L[1]*np.sin(q[0]+q[1]) +
                  self.L[2]*np.sin(np.sum(q)))
             return self.max_y - y
-
+        
         def y_lower_constraint(q, *args):
             y = (self.L[0]*np.sin(q[0]) + self.L[1]*np.sin(q[0]+q[1]) +
                  self.L[2]*np.sin(np.sum(q)))
             return y - self.min_y
 
+        # method to enforce upper and lower limits on joint angles
         def joint_limits_upper_constraint(q, *args):
             return self.max_angles - q
-
+       
         def joint_limits_lower_constraint(q, *args):
             return q - self.min_angles
 
+        # method to ensure that the final joint angle aligns with a predefined end angle
         def joint_limits_last_orientation(q, *args):
             return self.end_angle_tol - np.abs(np.sum(q)-self.end_angle)
 
+        #method to perform constrained optimization to find the joint angles (q) 
+        # that minimize the distance to the desired x-coordinate while satisfying all constraints
         self.min_y = min_y
         self.max_y = max_y
         if end_angle is not None:

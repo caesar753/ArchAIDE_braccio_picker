@@ -10,7 +10,7 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="braccio_arm">
-        <chain base_link="base_link" tip_link="link_5" />
+        <chain base_link="base_link" tip_link="arm_grasp_link" />
     </group>
     <group name="braccio_gripper">
         <joint name="gripper_joint" />
@@ -23,6 +23,15 @@
         <joint name="elbow_joint" value="0" />
         <joint name="wrist_pitch_joint" value="0" />
         <joint name="wrist_roll_joint" value="0" />
+        <joint name="braccio_grasp_joint" value="0" />
+    </group_state>
+    <group_state name="home_position" group="braccio_arm">
+        <joint name="base_joint" value="0" />
+        <joint name="shoulder_joint" value="-1.5708" />
+        <joint name="elbow_joint" value="-1.5708" />
+        <joint name="wrist_pitch_joint" value="-1.5708" />
+        <joint name="wrist_roll_joint" value="0" />
+        <joint name="braccio_grasp_joint" value="0" />
     </group_state>
     <group_state name="max_top" group="braccio_arm">
         <joint name="base_joint" value="0" />
@@ -30,6 +39,7 @@
         <joint name="elbow_joint" value="0" />
         <joint name="wrist_pitch_joint" value="0" />
         <joint name="wrist_roll_joint" value="0" />
+        <joint name="braccio_grasp_joint" value="0" />
     </group_state>
     <group_state name="min_top" group="braccio_arm">
         <joint name="base_joint" value="0" />
@@ -37,17 +47,29 @@
         <joint name="elbow_joint" value="1.3807" />
         <joint name="wrist_pitch_joint" value="0" />
         <joint name="wrist_roll_joint" value="0" />
+        <joint name="braccio_grasp_joint" value="0" />
     </group_state>
+    <group_state name="all_up" group="braccio_arm">
+        <joint name="base_joint" value="0"/>
+        <joint name="elbow_joint" value="1.58"/>
+        <joint name="shoulder_joint" value="1.58"/>
+        <joint name="wrist_pitch_joint" value="1.58"/>
+        <joint name="wrist_roll_joint" value="0"/>
+        <joint name="braccio_grasp_joint" value="0" />
+    </group_state>
+    
     <group_state name="freaky" group="braccio_arm">
         <joint name="base_joint" value="-1.0107" />
         <joint name="shoulder_joint" value="-2.6011" />
         <joint name="elbow_joint" value="0.6341" />
         <joint name="wrist_pitch_joint" value="-2.5508" />
         <joint name="wrist_roll_joint" value="-0.8228" />
+        <joint name="braccio_grasp_joint" value="0" />
     </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="world" />
+    <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="mount" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+     <!--OLD WITHOUT MOUNTING
     <disable_collisions link1="mount" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="link_1" reason="Adjacent" />
     <disable_collisions link1="link_1" link2="link_2" reason="Adjacent" />
@@ -60,4 +82,42 @@
     <disable_collisions link1="link_5" link2="right_gripper_link" reason="Adjacent" />
     <disable_collisions link1="link_5" link2="left_gripper_link" reason="Adjacent" />
     <disable_collisions link1="left_gripper_link" link2="right_gripper_link" reason="Adjacent" />
+    -->
+    <disable_collisions link1="base_link" link2="camera_link" reason="Adjacent"/>
+    <disable_collisions link1="base_link" link2="left_gripper_link" reason="Never"/>
+    <disable_collisions link1="base_link" link2="link_1" reason="Adjacent"/>
+    <disable_collisions link1="base_link" link2="link_2" reason="Never"/>
+    <disable_collisions link1="base_link" link2="link_3" reason="Never"/>
+    <disable_collisions link1="base_link" link2="link_4" reason="Never"/>
+    <disable_collisions link1="base_link" link2="link_5" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="left_gripper_link" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="link_1" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="link_2" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="link_3" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="link_4" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="link_5" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="right_gripper_link" reason="Never"/>
+    <disable_collisions link1="left_gripper_link" link2="link_1" reason="Never"/>
+    <disable_collisions link1="left_gripper_link" link2="link_2" reason="Never"/>
+    <disable_collisions link1="left_gripper_link" link2="link_3" reason="Never"/>
+    <disable_collisions link1="left_gripper_link" link2="link_4" reason="Never"/>
+    <disable_collisions link1="left_gripper_link" link2="link_5" reason="Adjacent"/>
+    <disable_collisions link1="left_gripper_link" link2="right_gripper_link" reason="Never"/>
+    <disable_collisions link1="link_1" link2="link_2" reason="Adjacent"/>
+    <disable_collisions link1="link_1" link2="link_3" reason="Never"/>
+    <disable_collisions link1="link_1" link2="link_4" reason="Never"/>
+    <disable_collisions link1="link_1" link2="link_5" reason="Never"/>
+    <disable_collisions link1="link_2" link2="link_3" reason="Adjacent"/>
+    <disable_collisions link1="link_2" link2="link_4" reason="Never"/>
+    <disable_collisions link1="link_2" link2="link_5" reason="Never"/>
+    <disable_collisions link1="link_2" link2="right_gripper_link" reason="Never"/>
+    <disable_collisions link1="link_3" link2="link_4" reason="Adjacent"/>
+    <disable_collisions link1="link_3" link2="link_5" reason="Never"/>
+    <disable_collisions link1="link_3" link2="right_gripper_link" reason="Never"/>
+    <disable_collisions link1="link_4" link2="link_5" reason="Adjacent"/>
+    <disable_collisions link1="link_4" link2="right_gripper_link" reason="Never"/>
+    <disable_collisions link1="link_5" link2="right_gripper_link" reason="Adjacent"/>
+    
+    <disable_collisions link1="left_gripper_link" link2="mount" reason="grasp"/>
+    <disable_collisions link1="right_gripper_link" link2="mount" reason="grasp"/>
 </robot>
