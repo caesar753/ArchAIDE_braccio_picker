@@ -45,18 +45,16 @@ if __name__ == '__main__':
 
             chosen_dimension = sherds[i].dimension
             
-            # pose_targetter.create_tf(new_chos, quat_z = 1.57)   
-            pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)         
+            pose_targetter.create_tf(new_chos, quat_z = 1.50)   
 
             targetter.go_to_target('top', chosen_name)
 
-            # targetter.go_start_position()
-
             success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
 
-            # if not success:
-            #     pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)
-            #     success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
+            if not success:
+                pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)
+                success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
+                targetter.go_to_j(j4 = 1.50)
 
             if success:  
                 targetter.transform_home(chosen_bowl, chosen_dimension)

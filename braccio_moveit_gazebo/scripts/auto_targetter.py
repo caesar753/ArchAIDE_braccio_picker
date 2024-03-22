@@ -365,6 +365,8 @@ class BraccioObjectTargetInterface(object):
 
     print(f"calculated joint_targets are {joint_targets}")
 
+    self.go_to_j(j4 = 1.5708)
+
     self.go_to_raise()
 
     self.gripper_open()
@@ -444,11 +446,6 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_0(self, dim):
-    # if dim > 35:
-    #   self.gripper_middle()
-    # else:
-    #   self.gripper_close()
-
     self.gripper_float(dim)
 
     # self.go_to_raise()
@@ -459,11 +456,6 @@ class BraccioObjectTargetInterface(object):
     # self.go_to_joint(self.joint_start)
 
   def go_to_home_1(self, dim):
-    # if dim > 35:
-    #   self.gripper_middle()
-    # else:
-    #   self.gripper_close()
-    
     self.gripper_float(dim)
     
     # self.go_to_raise()
@@ -474,11 +466,6 @@ class BraccioObjectTargetInterface(object):
     self.gripper_open()
 
   def go_to_home_2(self, dim):
-    # if dim > 35:
-    #   self.gripper_middle()
-    # else:
-    #   self.gripper_close()
-
     self.gripper_float(dim)
 
     # self.go_to_raise()
@@ -525,7 +512,6 @@ class BraccioObjectTargetInterface(object):
     return(self.i, self.targets_list, self.centers)
   
   def transform_home(self, bowl, dim):
-    self.go_to_j(j4 = 1.5708)
     home_ch = getattr(self, bowl)
     home_ch(dim)
     # return 0
