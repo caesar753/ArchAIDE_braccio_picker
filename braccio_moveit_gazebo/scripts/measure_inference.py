@@ -158,7 +158,7 @@ class segmeasure():
         PositionPub.print_coord(self)
 
     def image_show(self, orig, box, dimA, dimB, tltrX, tltrY, trbrX, trbrY,\
-                   blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY,  nome):
+                   blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY, nome):
         
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
 

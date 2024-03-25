@@ -63,6 +63,7 @@ def main():
     if initial_choose == "i":
         print("choose image \n")
         ch_img = input()
+        ch_img = "images/" + ch_img
     elif initial_choose == "c":
         camera.shoot()
         ch_img = "camera_image.jpg"
@@ -73,6 +74,7 @@ def main():
 
     print("which model?")
     md = input()
+    md = "CNNs/" + md
 
     print ("Do you want to show the image during sherd creation?")
     im_ch =input()
@@ -203,7 +205,7 @@ def main():
             segmentation.model_creation(dimA, dimB, n, class_sherd, angle)
             
             RosPub.add_link(nome, n, (centX/1000), (centY/1000))
-            
+
             if im_ch == "y":
                 segmentation.image_show(orig, box, dimA, dimB, tltrX, tltrY,\
                      trbrX, trbrY, blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY,  nome)        
@@ -211,6 +213,8 @@ def main():
         segmentation.ROI_number += 1
         n += 1
     
+    cv2.destroyAllWindows()
+
     with open(position_file) as f:
         array = np.array([[x for x in line.split()] for line in f])
 
@@ -270,10 +274,11 @@ def main():
     # os.chdir(vision_path)
     with open (choosen_file) as g:
         groups = np.array([[x for x in line.split()] for line in g])
-        print(groups)
+        groups = groups[:,0]
 
     link_choose = []
 
+    print(groups)
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
@@ -284,8 +289,8 @@ def main():
                     posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
                     # posizioni[i,6],
                     np.array2string(np.where([groups==posizioni[i,0]])[1]))
-            print(lk)
-            # print(np.where([groups==posizioni[i,0]])[0].astype(int))
+            # print(lk)
+            # print(np.where([groups==posizioni[i,0]])[1])
             link_choose.append(lk)
                 
     # converting the list in a numpy array
