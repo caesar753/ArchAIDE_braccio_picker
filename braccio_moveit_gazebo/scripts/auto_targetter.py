@@ -250,9 +250,13 @@ class BraccioObjectTargetInterface(object):
     self.go_gripper(1.15)
 
   def gripper_open(self, dim):
-    opening = 0.01 * dim + 0.3
+    # opening = 0.01 * dim + 0.3
+    opening = -0.01 * dim + 1.2
     rospy.loginfo("opening of gripper is " + str(opening))
-    self.go_gripper(opening)
+    if opening >= 0.4:
+      self.go_gripper(opening)
+    else:
+        self.go_gripper(0.4)
     # self.go_gripper(0.8)
     # self.go_gripper(1.01)
 
@@ -261,7 +265,7 @@ class BraccioObjectTargetInterface(object):
   
   def gripper_float(self, dim):
     # strenght = -0.0045 * dim + 1.35
-    strenght = -0.0045 * dim + 1.335
+    strenght = -0.0045 * dim + 1.32
     rospy.loginfo("strenght of grasp is " + str(strenght))
     self.go_gripper(strenght)
 
@@ -454,7 +458,7 @@ class BraccioObjectTargetInterface(object):
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0=2.355)
-    self.go_to_j(j1 = 1.67, j2 = 0.10, j3 = 0.5)
+    self.go_to_j(j1 = 1.67, j2 = 0.10, j3 = 0.45)
     self.gripper_open(dim)
     # self.go_to_joint(self.joint_start)
 
@@ -474,7 +478,7 @@ class BraccioObjectTargetInterface(object):
     # self.go_to_raise()
     self.go_to_pick()
     self.go_to_j(j0 = 2.355)
-    self.go_to_j(j1 = 1.47, j2 = 3.14, j3 = 2.50)
+    self.go_to_j(j1 = 1.47, j2 = 3.14, j3 = 2.55)
     self.gripper_open(dim)
     # self.gripper_open()
 

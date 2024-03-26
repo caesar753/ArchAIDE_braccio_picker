@@ -205,7 +205,7 @@ def main():
             
             # segmentation.add_link(x_mm, y_mm)
             
-            segmentation.model_creation(dimA, dimB, n, class_sherd, angle)
+            segmentation.model_creation(dimB, dimA, n, class_sherd, angle)
             
             RosPub.add_link(nome, n, (centX/1000), (centY/1000))
 

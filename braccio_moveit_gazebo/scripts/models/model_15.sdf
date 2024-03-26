@@ -1,6 +1,6 @@
 <sdf version='1.6'>     
   <model name='sherd'>
-    <pose frame=''>0.0 0.0 0.02 0 0 0.30134523274746766</pose>
+    <pose frame=''>0.0 0.0 0.02 0 0 1.2782346320861875</pose>
     <link name='link'>
       <pose>0.0 0.0 0.01 0.0 0.0 0</pose>
       <inertial>
@@ -17,7 +17,7 @@
       <collision name='collision'>
         <geometry>
           <mesh>
-            <scale>1.025 1.981 1</scale>
+            <scale>0.943 0.534 1</scale>
             <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
           </mesh>
         </geometry>
@@ -44,7 +44,7 @@
       <visual name='visual'>
        <geometry>
           <mesh>
-            <scale>1.025 1.981 1</scale>
+            <scale>0.943 0.534 1</scale>
             <uri>model://meshes/fragments/frag_1/meshes/model.dae</uri>
           </mesh>
         </geometry>
@@ -52,7 +52,7 @@
           <script>
             <uri>model://materials/scripts</uri>
             <uri>model://materials/textures</uri>
-            <name>RepeatedTexture/class64</name>
+            <name>RepeatedTexture/class51</name>
           </script>
         </material>
       </visual>

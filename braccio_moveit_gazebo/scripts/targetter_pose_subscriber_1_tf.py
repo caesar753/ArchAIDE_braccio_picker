@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
             chosen_dimension = sherds[i].dimension        
 
-            targetter.go_to_target('top', chosen_name)
+            targetter.go_to_target('top', chosen_name, chosen_dimension)
 
             pose_targetter.create_tf(new_chos, quat_x = -0.39, quat_z = 2.32)
             success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
