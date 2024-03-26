@@ -47,7 +47,7 @@ if __name__ == '__main__':
             
             pose_targetter.create_tf(new_chos, quat_z = 1.50)   
 
-            targetter.go_to_target('top', chosen_name)
+            targetter.go_to_target('top', chosen_name, chosen_dimension)
 
             success = pose_targetter.go_to_pos(pose_targetter.arm_target_pose)
 

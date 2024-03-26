@@ -249,8 +249,11 @@ class BraccioObjectTargetInterface(object):
   def gripper_close(self):
     self.go_gripper(1.15)
 
-  def gripper_open(self):
-    self.go_gripper(0.8)
+  def gripper_open(self, dim):
+    opening = 0.01 * dim + 0.3
+    rospy.loginfo("opening of gripper is " + str(opening))
+    self.go_gripper(opening)
+    # self.go_gripper(0.8)
     # self.go_gripper(1.01)
 
   def gripper_middle(self):
@@ -329,7 +332,7 @@ class BraccioObjectTargetInterface(object):
       return s, [phi, np.NaN, np.NaN, np.NaN]
     return s, [phi, q[0], q[1]+np.pi/2, q[2]+np.pi/2]
 
-  def go_to_xy(self, x, y, r, how):
+  def go_to_xy(self, x, y, r, how, dim):
     if how=='top':
       s, joint_targets = self.get_down_targets(x, y, np.pi/2)
       print(joint_targets)
@@ -369,7 +372,7 @@ class BraccioObjectTargetInterface(object):
 
     self.go_to_raise()
 
-    self.gripper_open()
+    self.gripper_open(dim)
     self.go_to_j(j0=float(joint_targets[0]))
 
     # self.go_to_j(j1=float(joint_targets[1]-0.125),
@@ -429,10 +432,10 @@ class BraccioObjectTargetInterface(object):
         v = float(tst)
     self.go_gripper(v)
 
-  def go_to_target(self, how, lk):
+  def go_to_target(self, how, lk, dim):
     x,y,r = self.get_box_position(lk)
     print(x, y, r)
-    return self.go_to_xy(x, y, r, how)
+    return self.go_to_xy(x, y, r, how, dim)
   
   # def go_link_choose(self, lk):
   #     self.link_choose = lk
@@ -452,7 +455,7 @@ class BraccioObjectTargetInterface(object):
     self.go_to_pick()
     self.go_to_j(j0=2.355)
     self.go_to_j(j1 = 1.67, j2 = 0.10, j3 = 0.5)
-    self.gripper_open()
+    self.gripper_open(dim)
     # self.go_to_joint(self.joint_start)
 
   def go_to_home_1(self, dim):
@@ -462,8 +465,8 @@ class BraccioObjectTargetInterface(object):
     self.go_to_pick()
     self.go_to_j(j0=0.785)
     self.go_to_j(j1=1.57, j2 = 3.00, j3 = 2.55)
-    self.gripper_open()
-    self.gripper_open()
+    self.gripper_open(dim)
+    # self.gripper_open()
 
   def go_to_home_2(self, dim):
     self.gripper_float(dim)
@@ -472,8 +475,8 @@ class BraccioObjectTargetInterface(object):
     self.go_to_pick()
     self.go_to_j(j0 = 2.355)
     self.go_to_j(j1 = 1.47, j2 = 3.14, j3 = 2.50)
-    self.gripper_open()
-    self.gripper_open()
+    self.gripper_open(dim)
+    # self.gripper_open()
 
   def go_to_up(self):
     self.go_to_j(j0=1.5708,j1=1.5708,j2=1.5708,j3=1.5708)

@@ -169,6 +169,7 @@ def main():
         # compute the size of the object
         dimA = dA / segmentation.pixelsPerMetric
         dimB = dB / segmentation.pixelsPerMetric
+        dim_med = (dimA+dimB)/2
         
         # n = n+1
         # if n > 0: #n == 0 is the measure specimen, no extraction and no prediction
@@ -194,10 +195,12 @@ def main():
             x_mm = repr(round(centX,2))
             y_mm = repr(round(centY,2))
             nome = ("sherd_" + str(n))
-            dim_x = repr(round(dimA,2))
-            dim_y = repr(round(dimB,2))
+            # dim_x = repr(round(dimA,2))
+            # dim_y = repr(round(dimB,2))
+            dim_med_str = repr(round(dim_med,2))
             position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + " " + \
-                dim_x + " " + dim_y + "\n")
+                # dim_x + " " + dim_y + "\n")
+                dim_med_str + "\n")
             position_mm.close()
             
             # segmentation.add_link(x_mm, y_mm)
@@ -286,8 +289,8 @@ def main():
                     posizioni[i, 2].astype(float), 
                     posizioni[i, 3].astype(float), 
                     posizioni[i,4], 
-                    posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
-                    # posizioni[i,6],
+                    # posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
+                    posizioni[i,5],
                     np.array2string(np.where([groups==posizioni[i,0]])[1]))
             # print(lk)
             # print(np.where([groups==posizioni[i,0]])[1])
