@@ -47,12 +47,13 @@ vision_path = "../vision/"
 
 
 class segmeasure():
-    def __init__(self, img, ld_model, method = "bottom-to-top", wdt = 100):
+    def __init__(self, img, ld_model, inference_file, method = "bottom-to-top", wdt = 100):
         # super(segmeasure, self).__init__()
         self.img = img
         self.width = int(wdt)
         self.method = method
         self.ld_model = ld_model
+        self.inference_file = inference_file
         self.pippo = None
         self.topolino = None
         self.prediction = 0
@@ -114,6 +115,9 @@ class segmeasure():
         # print(f'ROI is {self.ROI}')
 #       #Save the fragment ROI image
         print(f'ROI number is {self.ROI_number}')
+        # with open("../vision/inference.txt", 'a') as inference:
+        with open(self.inference_file, 'a') as inference:
+            inference.write('ROI number is ' + str(self.ROI_number) + '\n')
         
         #TO DO: IF THE IMAGE IS NOT PERFECTLY SEGMENTED EITHER THE ROI CANNOT BE SAVED (EMPTY IMAGE) OR THE INFER FUNCTION CRASHES!!
         # if self.ROI.any():
@@ -148,9 +152,16 @@ class segmeasure():
         # print(probs)
         confidence = (torch.max(probs.data, 1))[0].cpu().numpy()
         prediction = (torch.max(probs.data, 1))[1].cpu().numpy()
-        print('The prediction is %d with a confidence level of %.2f %%' % (prediction, (100* confidence)))
+        
+        pred_print = 'The prediction is %d with a confidence level of %.2f %% \n' % (prediction, (100* confidence))
+        print(pred_print)
+        # with open("../vision/inference.txt", 'a') as inference:
+        with open(self.inference_file, 'a') as inference:
+            inference.write(pred_print)
+        
         self.confidence = round(float(confidence), 2)
         self.prediction = int(prediction)
+        
         return self.confidence, self.prediction
         
         

@@ -52,7 +52,7 @@
           <script>
             <uri>model://materials/scripts</uri>
             <uri>model://materials/textures</uri>
-            <name>RepeatedTexture/class18</name>
+            <name>RepeatedTexture/class46</name>
           </script>
         </material>
       </visual>

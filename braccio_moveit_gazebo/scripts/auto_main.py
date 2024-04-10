@@ -63,6 +63,15 @@ def main():
     if initial_choose == "i":
         print("choose image \n")
         ch_img = input()
+        
+        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('full/done/', '') + ").txt")
+        print(inference_file)
+        if os.path.exists(inference_file):
+            os.remove(inference_file)
+        
+        with open(inference_file, 'a') as inference:
+            inference.write(ch_img + '\n')
+
         ch_img = "images/" + ch_img
     elif initial_choose == "c":
         camera.shoot()
@@ -79,7 +88,7 @@ def main():
     print ("Do you want to show the image during sherd creation?")
     im_ch =input()
     
-    segmentation = measure_inference.segmeasure(ch_img, md)
+    segmentation = measure_inference.segmeasure(ch_img, md, inference_file)
 
     segmentation.load_model()
     segmentation.readimage()
@@ -299,6 +308,9 @@ def main():
     # converting the list in a numpy array
     link_array = np.array(link_choose)
     print(f"selected are {np.array2string(link_array)}")
+    # with open("../vision/inference.txt", 'a') as inference:
+    with open(inference_file, 'a') as inference:
+        inference.write("selected are \n" +  np.array2string(link_array) + '\n')
 
     ###POINTCLOUD SEGMENTATION - START ###
     # print("starting pointcloud segmentation")
