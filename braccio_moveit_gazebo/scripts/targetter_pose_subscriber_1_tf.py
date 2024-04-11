@@ -53,6 +53,8 @@ if __name__ == '__main__':
 
             if success:  
                 targetter.transform_home(chosen_bowl, chosen_dimension)
+        
+        targetter.go_start_position()
    
     except KeyboardInterrupt:
     # User interrupt the program with ctrl+c
