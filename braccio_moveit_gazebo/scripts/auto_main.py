@@ -64,7 +64,8 @@ def main():
         print("choose image \n")
         ch_img = input()
         
-        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('full/done/', '') + ").txt")
+        # inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('full/done/', '') + ").txt")
+        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('/', '') + ").txt")
         print(inference_file)
         if os.path.exists(inference_file):
             os.remove(inference_file)

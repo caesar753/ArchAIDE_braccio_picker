@@ -386,7 +386,7 @@ Visualization Manager:
         camera_right_ir_optical_frame:
           Value: false
         central_gripper_link:
-          Value: true
+          Value: false
         left_gripper_link:
           Value: false
         link_1:
@@ -410,7 +410,7 @@ Visualization Manager:
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
         world:
           mount:
