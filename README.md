@@ -91,12 +91,6 @@ This is a short video to illustrate how the arm works
 
 ![GIF video](doc/archaide_picker_16_9.gif)
 
-## Learn more
-
-In [original lots-of-things repository](https://github.com/lots-of-things/braccio_moveit_gazebo) there is a more elaborate [blog post](#), that explains the internals in more detail. It covers the inverse kinematics solution, Gazebo+Moveit URDF setup, and Gazebo physics engine fine-tuning.
-
-The original [lots-of-things repository](https://github.com/lots-of-things/braccio_moveit_gazebo) is a subtask in the creation of my [`su_chef` project](https://bonkerfield.org/su_chef/), an open-source, automated food prep assistant.
-
 ## Contact
 
 For bugs, you can file [an issue](https://github.com/caesar753/ArchAIDE_braccio_picker/issues) and I'll take a look.
