@@ -7,8 +7,6 @@ Panels:
         - /MotionPlanning1
         - /MotionPlanning1/Scene Geometry1
         - /MotionPlanning1/Scene Robot1
-        - /MotionPlanning1/Scene Robot1/Links1
-        - /MotionPlanning1/Scene Robot1/Links1/camera_bottom_screw_frame1
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planning Metrics1
         - /MotionPlanning1/Planned Path1
@@ -16,14 +14,6 @@ Panels:
         - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /TF1/Tree1/world1
-        - /TF1/Tree1/world1/mount1
-        - /TF1/Tree1/world1/mount1/base_link1
-        - /TF1/Tree1/world1/mount1/base_link1/link_11
-        - /TF1/Tree1/world1/mount1/base_link1/link_11/link_21
-        - /TF1/Tree1/world1/mount1/base_link1/link_11/link_21/link_31
-        - /TF1/Tree1/world1/mount1/camera_bottom_screw_frame1
-        - /TF1/Tree1/world1/mount1/camera_bottom_screw_frame1/camera_link1
       Splitter Ratio: 0.5804701447486877
     Tree Height: 568
   - Class: rviz/Help
@@ -89,6 +79,10 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          arm_grasp_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           base_link:
             Alpha: 1
             Show Axes: false
@@ -135,7 +129,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          gripper_grasp_link:
+          central_gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -229,6 +223,10 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          arm_grasp_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           base_link:
             Alpha: 1
             Show Axes: false
@@ -275,7 +273,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          gripper_grasp_link:
+          central_gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -363,7 +361,7 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        arm_grasp_pose:
+        arm_grasp_link:
           Value: true
         base_link:
           Value: false
@@ -387,10 +385,8 @@ Visualization Manager:
           Value: false
         camera_right_ir_optical_frame:
           Value: false
-        gripper_grasp_link:
-          Value: true
-        hand_grasp_pose:
-          Value: true
+        central_gripper_link:
+          Value: false
         left_gripper_link:
           Value: false
         link_1:
@@ -417,10 +413,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          arm_grasp_pose:
-            {}
-          hand_grasp_pose:
-            {}
           mount:
             base_link:
               link_1:
@@ -428,8 +420,9 @@ Visualization Manager:
                   link_3:
                     link_4:
                       link_5:
-                        gripper_grasp_link:
-                          {}
+                        arm_grasp_link:
+                          central_gripper_link:
+                            {}
                         left_gripper_link:
                           {}
                         right_gripper_link:
