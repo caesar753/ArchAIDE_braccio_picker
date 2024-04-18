@@ -47,12 +47,13 @@ vision_path = "../vision/"
 
 
 class segmeasure():
-    def __init__(self, img, ld_model, method = "bottom-to-top", wdt = 100):
+    def __init__(self, img, ld_model, inference_file, method = "bottom-to-top", wdt = 100):
         # super(segmeasure, self).__init__()
         self.img = img
         self.width = int(wdt)
         self.method = method
         self.ld_model = ld_model
+        self.inference_file = inference_file
         self.pippo = None
         self.topolino = None
         self.prediction = 0
@@ -114,6 +115,9 @@ class segmeasure():
         # print(f'ROI is {self.ROI}')
 #       #Save the fragment ROI image
         print(f'ROI number is {self.ROI_number}')
+        # with open("../vision/inference.txt", 'a') as inference:
+        with open(self.inference_file, 'a') as inference:
+            inference.write('ROI number is ' + str(self.ROI_number) + '\n')
         
         #TO DO: IF THE IMAGE IS NOT PERFECTLY SEGMENTED EITHER THE ROI CANNOT BE SAVED (EMPTY IMAGE) OR THE INFER FUNCTION CRASHES!!
         # if self.ROI.any():
@@ -148,9 +152,16 @@ class segmeasure():
         # print(probs)
         confidence = (torch.max(probs.data, 1))[0].cpu().numpy()
         prediction = (torch.max(probs.data, 1))[1].cpu().numpy()
-        print('The prediction is %d with a confidence level of %.2f %%' % (prediction, (100* confidence)))
+        
+        pred_print = 'The prediction is %d with a confidence level of %.2f %% \n' % (prediction, (100* confidence))
+        print(pred_print)
+        # with open("../vision/inference.txt", 'a') as inference:
+        with open(self.inference_file, 'a') as inference:
+            inference.write(pred_print)
+        
         self.confidence = round(float(confidence), 2)
         self.prediction = int(prediction)
+        
         return self.confidence, self.prediction
         
         
@@ -158,7 +169,7 @@ class segmeasure():
         PositionPub.print_coord(self)
 
     def image_show(self, orig, box, dimA, dimB, tltrX, tltrY, trbrX, trbrY,\
-                   blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY,  nome):
+                   blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY, nome):
         
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
 
@@ -167,10 +178,10 @@ class segmeasure():
             cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
 
         # draw the object sizes on the image
-        cv2.putText(orig, "{:.1f}mm".format(dimA),
+        cv2.putText(orig, "{:.1f}mm".format(dimB),
             (int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
             0.65, (255, 255, 255), 2)
-        cv2.putText(orig, "{:.1f}mm".format(dimB),
+        cv2.putText(orig, "{:.1f}mm".format(dimA),
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
             0.65, (255, 255, 255), 2)
         

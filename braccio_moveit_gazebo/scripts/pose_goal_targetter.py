@@ -10,7 +10,12 @@ from gazebo_msgs.msg import LinkStates, ModelState
 import moveit_msgs.msg
 from geometry_msgs.msg import Pose, PoseStamped
 from gazebo_msgs.srv import SetModelState
+
+import pytransform3d.transformations as pytr
+from tf.transformations import quaternion_from_euler, quaternion_multiply
+
 from custom_msgs.msg import matrix
+import vision_utils
 
 ## END_SUB_TUTORIAL
 import numpy as np
@@ -110,6 +115,9 @@ class BraccioPoseGoal(object):
     self.states_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.linkstate_callback)
     self.targets_list = []
     self.i = 0
+
+    self.arm_target_pose = Pose()
+    self.gripper_grasp_pose = Pose()
     # Subscriber to /targets topic with matrix message
     # self.target_matrix = rospy.Subscriber("/targets", matrix, self.callback_matrix)
     #sleep else ROS cannot get the robot state and the matrix msg
@@ -233,15 +241,79 @@ class BraccioPoseGoal(object):
     except ValueError:
       pass
 
+  def create_tf(self, sherd_center, quat_x = 0.0, quat_y = 0.0, quat_z = 0.0):
+    tf_hand = vision_utils.get_transform(parent_frame="central_gripper_link",\
+                                                    child_frame="arm_grasp_link")
+    # print (tf)
+
+    hand_arm_transform = pytr.transform_from_pq([tf_hand.transform.translation.x,
+                                                tf_hand.transform.translation.y,
+                                                tf_hand.transform.translation.z,
+                                                tf_hand.transform.rotation.w,
+                                                tf_hand.transform.rotation.x,
+                                                tf_hand.transform.rotation.y,
+                                                tf_hand.transform.rotation.z
+                                                ])
+    
+    hand_tf = vision_utils.get_hand_tf()
+
+    print(hand_tf.shape)
+
+    initial_pose = np.concatenate((sherd_center, hand_tf))
+    initial_pose = vision_utils.get_pose_from_arr(initial_pose)
+
+    ### Transform the pose from the camera frame to the base frame (world)
+    hand_pose_world = vision_utils.transform_pose_vislab(initial_pose, "camera_depth_optical_frame", "world")
+    hand_pose_world_np = vision_utils.get_arr_from_pose(hand_pose_world)
+
+    hand_pose_world_np = vision_utils.get_arr_from_pose(initial_pose)
+    
+    # hand_pose_world_np[0] -= 0.0025
+    # hand_pose_world_np[1] -= 0.0025
+    # # hand_pose_world_np[2] = 1.15 + 0.15
+    # hand_pose_world_np[2] += 0.025
+    hand_pose_world_np[2] += 0.0025
+    # hand_pose_world_np[3:] = hand_tf
+
+    hand_pose_world_quaternion = hand_pose_world_np[3:]
+    print(f"hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+
+    rotation_quaternion = quaternion_from_euler(quat_x, quat_y, quat_z)
+
+    hand_pose_world_quaternion = quaternion_multiply(rotation_quaternion, hand_pose_world_quaternion)
+    
+    print(f"rotated hand_pose_world_quaternion is {hand_pose_world_quaternion}")
+
+    hand_pose_world_np[3:] = hand_pose_world_quaternion
+    
+    print(f"final hand_pose_world_np is {hand_pose_world_np}")
+
+    self.gripper_grasp_pose = vision_utils.get_pose_from_arr(hand_pose_world_np)
+    vision_utils.publish_tf_np(hand_pose_world_np, child_frame='gripper_grasp_pose')
+
+    hand_pose_world_np[3:] = np.roll(hand_pose_world_np[3:], 1)
+    
+    print(f"hand_pose_world_np roll is {hand_pose_world_np}")
+
+    T0 = pytr.transform_from_pq(hand_pose_world_np)
+    T1 = pytr.concat(hand_arm_transform, T0)
+
+    arm_target_pose_np = vision_utils.get_pose_from_transform(T1)
+
+    # arm_target_pose_np = vision_utils.get_arr_from_pose(arm_target_pose)
+    vision_utils.publish_tf_np(arm_target_pose_np, child_frame='arm_grasp_pose')
+    # arm_target_pose_stamped = vision_utils.get_pose_stamped_from_arr(arm_target_pose_np)
+    self.arm_target_pose = vision_utils.get_pose_from_arr(arm_target_pose_np)
+    
   def go_to_pos(self, target_pose):
 
     pose_start = self.move_group.get_current_pose()
 
-    self.move_group.set_planning_time(20)
+    self.move_group.set_planning_time(5)
     self.move_group.set_num_planning_attempts(10)
     # self.move_group.set_goal_tolerance(0.1)
-    # self.move_group.set_goal_position_tolerance(0.07)
-    self.move_group.set_goal_orientation_tolerance(0.4)
+    self.move_group.set_goal_position_tolerance(0.007)
+    self.move_group.set_goal_orientation_tolerance(0.15)
     
     self.move_group.set_pose_target(target_pose)
 
@@ -258,7 +330,7 @@ class BraccioPoseGoal(object):
     _, plan, _, _ = self.move_group.plan()
 
     #execute plan
-    self.move_group.execute(plan)
+    self.move_group.execute(plan, wait = True)
 
     display_trajectory = moveit_msgs.msg.DisplayTrajectory()
     display_trajectory.trajectory_start = self.robot.get_current_state()
@@ -275,6 +347,8 @@ class BraccioPoseGoal(object):
     if len_points == 0:
         self.nh.logwarn("No plan found")
         return False
+    # else:
+    return True
 
     
   

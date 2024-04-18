@@ -62,12 +62,25 @@ After a few seconds some sherd meshes with different colors will show on the sce
 
 ### Selection and grasp of the choosen sherds
 
-In another terminallaunch the script `targetter_subscriber.py` which subscribes to the `/targets` message, picks the fragments of the choosen classes and puts them in the assigned bowl.
+In another terminal launch the script which subscribes to the `/targets` message, picks the fragments of the choosen classes and puts them in the assigned bowl.
+
+First of all remember to source the package and go into `braccio_moveit_gazebo/scripts` directory
 
 ```
 source devel/setup.bash
 cd src/ArchAIDE_braccio_picker/braccio_moveit_gazebo/scripts
-rosrun braccio_moveit_gazebo targetter_subscriber.py
+```
+
+Then you can try to create a single coordinate system on the fragment, oriented with an angle of 45 degrees with the x axis, (this system maximizes the kinematic compatibility of the pose) by running the following command
+
+```
+rosrun braccio_moveit_gazebo targetter_pose_subscriber_1_tf.py
+```
+
+or try to create a coordinate system on the fragment, forming an angle of 90 degrees with the x axis, and if the grasp pose is not kinematically compatible, replace it with the 45 degree reference system as above, launching this command
+
+```
+rosrun braccio_moveit_gazebo targetter_pose_subscriber_2_tf.py
 ```
 
 ![Pick up](doc/pick_up.png)
@@ -77,12 +90,6 @@ rosrun braccio_moveit_gazebo targetter_subscriber.py
 This is a short video to illustrate how the arm works
 
 ![GIF video](doc/archaide_picker_16_9.gif)
-
-## Learn more
-
-In [original lots-of-things repository](https://github.com/lots-of-things/braccio_moveit_gazebo) there is a more elaborate [blog post](#), that explains the internals in more detail. It covers the inverse kinematics solution, Gazebo+Moveit URDF setup, and Gazebo physics engine fine-tuning.
-
-The original [lots-of-things repository](https://github.com/lots-of-things/braccio_moveit_gazebo) is a subtask in the creation of my [`su_chef` project](https://bonkerfield.org/su_chef/), an open-source, automated food prep assistant.
 
 ## Contact
 

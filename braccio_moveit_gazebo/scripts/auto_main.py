@@ -63,6 +63,17 @@ def main():
     if initial_choose == "i":
         print("choose image \n")
         ch_img = input()
+        
+        # inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('full/done/', '') + ").txt")
+        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('/', '') + ").txt")
+        print(inference_file)
+        if os.path.exists(inference_file):
+            os.remove(inference_file)
+        
+        with open(inference_file, 'a') as inference:
+            inference.write(ch_img + '\n')
+
+        ch_img = "images/" + ch_img
     elif initial_choose == "c":
         camera.shoot()
         ch_img = "camera_image.jpg"
@@ -73,11 +84,12 @@ def main():
 
     print("which model?")
     md = input()
+    md = "CNNs/" + md
 
     print ("Do you want to show the image during sherd creation?")
     im_ch =input()
     
-    segmentation = measure_inference.segmeasure(ch_img, md)
+    segmentation = measure_inference.segmeasure(ch_img, md, inference_file)
 
     segmentation.load_model()
     segmentation.readimage()
@@ -114,7 +126,7 @@ def main():
         else:
             angle = -angle
         
-        angle = math.radians(angle)
+        angle = np.abs(math.radians(angle))
 
         box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
         box = np.array(box, dtype="int")
@@ -167,6 +179,7 @@ def main():
         # compute the size of the object
         dimA = dA / segmentation.pixelsPerMetric
         dimB = dB / segmentation.pixelsPerMetric
+        dim_med = (dimA+dimB)/2
         
         # n = n+1
         # if n > 0: #n == 0 is the measure specimen, no extraction and no prediction
@@ -192,15 +205,20 @@ def main():
             x_mm = repr(round(centX,2))
             y_mm = repr(round(centY,2))
             nome = ("sherd_" + str(n))
-            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + "\n")
+            # dim_x = repr(round(dimA,2))
+            # dim_y = repr(round(dimB,2))
+            dim_med_str = repr(round(dim_med,2))
+            position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + " " + \
+                # dim_x + " " + dim_y + "\n")
+                dim_med_str + "\n")
             position_mm.close()
             
             # segmentation.add_link(x_mm, y_mm)
             
-            segmentation.model_creation(dimA, dimB, n, class_sherd, angle)
+            segmentation.model_creation(dimB, dimA, n, class_sherd, angle)
             
             RosPub.add_link(nome, n, (centX/1000), (centY/1000))
-            
+
             if im_ch == "y":
                 segmentation.image_show(orig, box, dimA, dimB, tltrX, tltrY,\
                      trbrX, trbrY, blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY,  nome)        
@@ -208,6 +226,8 @@ def main():
         segmentation.ROI_number += 1
         n += 1
     
+    cv2.destroyAllWindows()
+
     with open(position_file) as f:
         array = np.array([[x for x in line.split()] for line in f])
 
@@ -265,24 +285,33 @@ def main():
 
     choosen_file = os.path.join(vision_path, "choosen.txt")
     # os.chdir(vision_path)
-    # with open (os.path.join(vision_path, "cazzo.txt")) as g:
     with open (choosen_file) as g:
         groups = np.array([[x for x in line.split()] for line in g])
-        print(groups)
+        groups = groups[:,0]
 
     link_choose = []
 
+    print(groups)
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
-            lk = (posizioni[i, 0].astype(int), posizioni[i,4], np.array2string(np.where([groups==posizioni[i,0]])[1]))
-            print(lk)
-            # print(np.where([groups==posizioni[i,0]])[0].astype(int))
+            lk = (posizioni[i, 0].astype(int), 
+                    posizioni[i, 2].astype(float), 
+                    posizioni[i, 3].astype(float), 
+                    posizioni[i,4], 
+                    # posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
+                    posizioni[i,5],
+                    np.array2string(np.where([groups==posizioni[i,0]])[1]))
+            # print(lk)
+            # print(np.where([groups==posizioni[i,0]])[1])
             link_choose.append(lk)
                 
     # converting the list in a numpy array
     link_array = np.array(link_choose)
     print(f"selected are {np.array2string(link_array)}")
+    # with open("../vision/inference.txt", 'a') as inference:
+    with open(inference_file, 'a') as inference:
+        inference.write("selected are \n" +  np.array2string(link_array) + '\n')
 
     ###POINTCLOUD SEGMENTATION - START ###
     # print("starting pointcloud segmentation")
@@ -310,16 +339,28 @@ def main():
     for j in range(len(link_array)):
         #Generating the target message, fields are: nr[int], sherd[str], home[str]
         target_msg = target()
+        
         target_msg.nr = j
-        inp_ch = link_array[j,1].astype(str) + "::link"
+        
+        inp_ch = link_array[j,3].astype(str) + "::link"
         print(inp_ch)
         target_msg.sherd = inp_ch
-        bowl_ch = link_array[j,2].astype(str)
+
+        cent_x = link_array[j,1].astype(float)
+        cent_y = link_array[j,2].astype(float)
+        target_msg.center = [cent_x, cent_y]
+        
+        bowl_ch = link_array[j,5].astype(str)
         bowl_ch = bowl_ch.replace('\'','').replace('\'','')
         bowl_ch = bowl_ch.replace('[','').replace(']','')
         bowl_ch = "go_to_home_" + bowl_ch
         print(bowl_ch)
         target_msg.home = bowl_ch
+
+        dim = link_array[j,4].astype(float)
+        print(f'dim is {dim}')
+        target_msg.dimension = dim
+        
         #Appending the target message to the list
         target_msg_arr.append(target_msg)
     

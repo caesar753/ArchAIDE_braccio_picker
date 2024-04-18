@@ -1,31 +1,28 @@
 #!/usr/bin/env python3
-import sys
-import time
-import os
-import  numpy as np
-import scipy
-
+import numpy as np
+import scipy.optimize
 
 class Arm3Link:
     """
-    A simple inverse kinematics solver for a should-elbow-wrist robot arm
+    A simple inverse kinematics solver for a shoulder-elbow-wrist robot arm
     credit: https://github.com/studywolf/blog/tree/master/InvKin
     """
     def __init__(self, L=None):
         # initial joint angles
         self.q = [0, 0, 0]
+        self.q1 = [0, 0, 0]
         # some default arm positions
         self.L = np.array([1, 1, 0.8]) if L is None else L
         self.max_y = 1
         self.min_y = 0
+
+        self.z_target = 0.01
 
         self.end_angle_tol = 0.05
         self.end_angle = -np.pi/2
         self.max_angles = [1.6, np.pi/2, np.pi/2]
         self.min_angles = [0.27, -np.pi/2, -np.pi/2]
 
-    #method to calculate the x and y coordinates of the end effector (wrist) 
-    #given the joint angles (q) using trigonometric equations.
     def get_xy(self, q=None):
         if q is None:
             q = self.q
@@ -40,18 +37,17 @@ class Arm3Link:
 
         return [x, y]
 
-    # method to perform inverse kinematics to calculate the joint angles required 
-    # to reach a given x-coordinate
-    def inv_kin(self, x, min_y, max_y, end_angle):
-
-        # method to calculate the difference between the desired x-coordinate 
-        #and the current x-coordinate of the end effector.
+    def inv_kin(self, x, z_target, min_y, max_y, end_angle):
         def distance_to_default(q, x):
             x = (self.L[0]*np.cos(q[0]) + self.L[1]*np.cos(q[0]+q[1]) +
                  self.L[2]*np.cos(np.sum(q))) - x
             return x**2
 
-        # methods to ensure that the y-coordinate of the end effector lies within specified bounds
+        def z_final_constraint(q, *args):
+            z = (self.L[0]*np.sin(q[0]) + self.L[1]*np.sin(q[0]+q[1]) +
+                 self.L[2]*np.sin(np.sum(q)))
+            return z - z_target
+
         def y_upper_constraint(q, *args):
             y = (self.L[0]*np.sin(q[0]) + self.L[1]*np.sin(q[0]+q[1]) +
                  self.L[2]*np.sin(np.sum(q)))
@@ -62,19 +58,15 @@ class Arm3Link:
                  self.L[2]*np.sin(np.sum(q)))
             return y - self.min_y
 
-        # method to enforce upper and lower limits on joint angles
         def joint_limits_upper_constraint(q, *args):
             return self.max_angles - q
        
         def joint_limits_lower_constraint(q, *args):
             return q - self.min_angles
 
-        # method to ensure that the final joint angle aligns with a predefined end angle
         def joint_limits_last_orientation(q, *args):
             return self.end_angle_tol - np.abs(np.sum(q)-self.end_angle)
 
-        #method to perform constrained optimization to find the joint angles (q) 
-        # that minimize the distance to the desired x-coordinate while satisfying all constraints
         self.min_y = min_y
         self.max_y = max_y
         if end_angle is not None:
@@ -84,6 +76,18 @@ class Arm3Link:
                                                joint_limits_upper_constraint,
                                                joint_limits_lower_constraint,
                                                y_upper_constraint,
-                                               y_lower_constraint])
+                                               y_lower_constraint,
+                                               z_final_constraint])
         self.q = q
         return self.q
+
+# # Example usage
+# if __name__ == "__main__":
+#     arm = Arm3Link()
+#     x_target = 2  # Desired x-coordinate
+#     z_target = 0.5  # Desired z-coordinate
+#     min_y = 0
+#     max_y = 1
+#     end_angle = -np.pi/2
+#     joint_angles = arm.inv_kin(x_target, z_target, min_y, max_y, end_angle)
+#     print("Joint angles:", joint_angles)
