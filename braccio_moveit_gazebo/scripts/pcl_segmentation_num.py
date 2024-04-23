@@ -9,7 +9,7 @@ from std_msgs.msg import Header
 
 import open3d as o3d
 from open3d_ros_helper import open3d_ros_helper as orh
-import auto_targetter
+# import auto_targetter
 import numpy as np
 # import scipy.spatial
 from scipy.spatial.transform import Rotation as R
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     rospy.init_node('pcl_vis', anonymous=True)
     
-    targetter = auto_targetter.BraccioObjectTargetInterface(rospy)
+    # targetter = auto_targetter.BraccioObjectTargetInterface(rospy)
     
     stamp = rospy.Time.now()
     rate = rospy.Rate(10)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     num_frescos, pcd, table_cloud, object_cloud, objects_pcl = vision_utils.get_number_of_sherds(pcd, debug)#, use_pyrealsense)
     print (f'Number of frescos detected: {num_frescos}')
 
-    print(object_cloud)
+    # print(object_cloud)
 
     # object_cloud, ind = voxel_pc.remove_radius_outlier(nb_points=40, radius=0.003)
     # object_cloud.paint_uniform_color([1, 0, 0])
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         # o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, object_cloud, bbox_object])
         o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud])
         # o3d.visualization.draw_geometries([mesh_coord_frame, object_cloud], bbox_object])
-        o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, objects_pcl[0], bbox_objects[0], objects_pcl[1], bbox_objects[1]])
+        # o3d.visualization.draw_geometries([mesh_coord_frame, table_cloud, objects_pcl[0], bbox_objects[0], objects_pcl[1], bbox_objects[1]])
     
     # targetter.get_box_position("sherd_2::link")
 

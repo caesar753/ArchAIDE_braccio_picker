@@ -312,7 +312,8 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
 
     object_cloud, ind = voxel_pc.remove_radius_outlier(nb_points=40, radius=0.03)
 
-    labels = np.array(object_cloud.cluster_dbscan(eps=0.02, min_points=10, print_progress=True))
+    # labels = np.array(object_cloud.cluster_dbscan(eps=0.02, min_points=10, print_progress=True))
+    labels = np.array(object_cloud.cluster_dbscan(eps=0.005, min_points=10, print_progress=True))
     print(f"labels shape is {labels.shape}")
 
     # object1 = np.asarray(object_cloud.points)[labels[:] == 0]
@@ -320,6 +321,7 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
     # object1_lab = labels[labels[:] == 1]
     # print(object1_lab.shape)
     
+    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.0])
 
     objects_pcl = []
     labels_size = np.size(np.asarray(labels))
@@ -335,7 +337,7 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
 
         n_objects = 0
         for label in np.unique(labels):
-            print(label)
+            # print(label)
             idxs = (labels == label)
             print(idxs)
             print(idxs.shape)
@@ -345,10 +347,10 @@ def get_number_of_sherds(pcd = None, debug=False): #, use_pyrealsense=False):
                 out_pc = o3d.geometry.PointCloud()
                 out_pc.points = o3d.utility.Vector3dVector(np.asarray(object_cloud.points)[labels[:] == label])
                 objects_pcl.append(out_pc)
-                o3d.visualization.draw_geometries([out_pc])
+                o3d.visualization.draw_geometries([out_pc, mesh_coord_frame])
                 n_objects += 1
 
-    mesh_coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3, origin=[0, 0, 0.0])
+    
 
     # for i in np.unique(labels):
     #     out_pc = o3d.geometry.PointCloud()
