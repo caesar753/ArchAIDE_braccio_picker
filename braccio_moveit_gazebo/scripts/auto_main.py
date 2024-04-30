@@ -195,8 +195,8 @@ def main():
             segmentation.infer()
         
             # distance of center of sherd from image origin
-            centX = segmentation.x_center / segmentation.pixelsPerMetric
-            centY = segmentation.y_center / segmentation.pixelsPerMetric
+            centX = (segmentation.x_center / segmentation.pixelsPerMetric) + 50
+            centY = (segmentation.y_center / segmentation.pixelsPerMetric) + 50
             print(f"Center of sherds from origin in mm is {centX}, {centY}")
             position_mm = open(position_file, "a")
             conf = repr(segmentation.confidence)
