@@ -294,7 +294,7 @@ def main():
     print(groups)
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
-        if (np.in1d(posizioni[i,0], groups)): 
+        if (np.in1d(posizioni[i,0], groups)):# and posizioni[i,1].astype(float) >= 0.35: 
             lk = (posizioni[i, 0].astype(int), 
                     posizioni[i, 2].astype(float), 
                     posizioni[i, 3].astype(float), 
