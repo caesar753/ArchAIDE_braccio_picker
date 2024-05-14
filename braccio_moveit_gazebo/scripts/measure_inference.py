@@ -126,44 +126,47 @@ class segmeasure():
     def position(self):
         PositionPub.print_coord(self)                          
                 
-
     def infer(self):
       
         #re-opens as a PIL image the fragment ROI image
         # infim = Image.open("segmentation/ROI_{self.ROI_number}.png".format(self.ROI_number), self.ROI)
         infim = Image.open(os.path.join(vision_path,"segmentation/ROI_{}.png".format(self.ROI_number)))
         # cv2.imshow('ROI', infim)
+        
+        if infim is not None:
+            #transforms the image into a tensor, unsqueezing dimension 0, and pases it to cuda()
+            if torch.cuda.is_available():
+                infim = infer_transform(infim).unsqueeze(0).cuda()
+            else:
+                infim = infer_transform(infim).unsqueeze(0)
 
-        #transforms the image into a tensor, unsqueezing dimension 0, and pases it to cuda()
-        if torch.cuda.is_available():
-            infim = infer_transform(infim).unsqueeze(0).cuda()
+            # #get the prediction from the loaded model
+            output = self.model(infim)
+            # print(output)
+
+            #Only prediction
+            # prediction = int(torch.max(output.data, 1)[1].cpu().numpy())
+
+            #Prediction with confidence level
+            probs = nn.functional.softmax(output, dim=1)
+            # print(probs)
+            confidence = (torch.max(probs.data, 1))[0].cpu().numpy()
+            prediction = (torch.max(probs.data, 1))[1].cpu().numpy()
+            
+            pred_print = 'The prediction is %d with a confidence level of %.2f %% \n' % (prediction, (100* confidence))
+            print(pred_print)
+            # with open("../vision/inference.txt", 'a') as inference:
+            with open(self.inference_file, 'a') as inference:
+                inference.write(pred_print)
+            
+            self.confidence = round(float(confidence), 2)
+            self.prediction = int(prediction)
+
+            return self.confidence, self.prediction
+        
         else:
-            infim = infer_transform(infim).unsqueeze(0)
-
-        # #get the prediction from the loaded model
-        output = self.model(infim)
-        # print(output)
-
-        #Only prediction
-        # prediction = int(torch.max(output.data, 1)[1].cpu().numpy())
-
-        #Prediction with confidence level
-        probs = nn.functional.softmax(output, dim=1)
-        # print(probs)
-        confidence = (torch.max(probs.data, 1))[0].cpu().numpy()
-        prediction = (torch.max(probs.data, 1))[1].cpu().numpy()
-        
-        pred_print = 'The prediction is %d with a confidence level of %.2f %% \n' % (prediction, (100* confidence))
-        print(pred_print)
-        # with open("../vision/inference.txt", 'a') as inference:
-        with open(self.inference_file, 'a') as inference:
-            inference.write(pred_print)
-        
-        self.confidence = round(float(confidence), 2)
-        self.prediction = int(prediction)
-        
-        return self.confidence, self.prediction
-        
+            print("ROI is empty")
+            pass  
         
     def position(self):
         PositionPub.print_coord(self)
@@ -172,6 +175,8 @@ class segmeasure():
                    blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY, nome):
         
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
+
+        cv2.circle(orig, (0,0), 15, (0, 0, 255), -1)
 
         # loop over the original points and draw them
         for (x, y) in box:

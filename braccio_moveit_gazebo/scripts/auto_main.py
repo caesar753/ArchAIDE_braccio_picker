@@ -77,6 +77,15 @@ def main():
     elif initial_choose == "c":
         camera.shoot()
         ch_img = "camera_image.jpg"
+
+
+        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('.jpg', '') + ").txt")
+        print(inference_file)
+        if os.path.exists(inference_file):
+            os.remove(inference_file)
+        
+        with open(inference_file, 'a') as inference:
+            inference.write(ch_img + '\n')
     else:
         print("No valid choice")
         return 1
@@ -195,8 +204,8 @@ def main():
             segmentation.infer()
         
             # distance of center of sherd from image origin
-            centX = segmentation.x_center / segmentation.pixelsPerMetric
-            centY = segmentation.y_center / segmentation.pixelsPerMetric
+            centX = (segmentation.x_center / segmentation.pixelsPerMetric) + 50
+            centY = (segmentation.y_center / segmentation.pixelsPerMetric) + 50
             print(f"Center of sherds from origin in mm is {centX}, {centY}")
             position_mm = open(position_file, "a")
             conf = repr(segmentation.confidence)
@@ -294,7 +303,7 @@ def main():
     print(groups)
     #creating a list with the choosen link name
     for i in range(len(posizioni)):
-        if (np.in1d(posizioni[i,0], groups)): 
+        if (np.in1d(posizioni[i,0], groups)):# and posizioni[i,1].astype(float) >= 0.35: 
             lk = (posizioni[i, 0].astype(int), 
                     posizioni[i, 2].astype(float), 
                     posizioni[i, 3].astype(float), 
