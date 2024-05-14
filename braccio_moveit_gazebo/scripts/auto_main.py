@@ -77,6 +77,15 @@ def main():
     elif initial_choose == "c":
         camera.shoot()
         ch_img = "camera_image.jpg"
+
+
+        inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('.jpg', '') + ").txt")
+        print(inference_file)
+        if os.path.exists(inference_file):
+            os.remove(inference_file)
+        
+        with open(inference_file, 'a') as inference:
+            inference.write(ch_img + '\n')
     else:
         print("No valid choice")
         return 1
