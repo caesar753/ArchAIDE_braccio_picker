@@ -66,12 +66,13 @@ class segmeasure():
     def readimage(self):
         self.image = cv2.imread(self.img)
         # self.image = imutils.resize(self.image, width=640, height=480)
+        return self.image
 
     def transimage(self):
         self.ROI_number = 0
-        Contours_number = 0
+        # Contours_number = 0
         
-        original = self.image.copy()
+        # original = self.image.copy()
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         # gray = cv2.medianBlur(gray,5)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
@@ -97,6 +98,7 @@ class segmeasure():
         (cnts, _) = contours.sort_contours(cnts, self.method)
         self.cnts = cnts
         self.pixelsPerMetric = None
+        return self.thresholded, self.cnts, self.pixelsPerMetric
 
     
     #load model
@@ -121,7 +123,11 @@ class segmeasure():
         
         #TO DO: IF THE IMAGE IS NOT PERFECTLY SEGMENTED EITHER THE ROI CANNOT BE SAVED (EMPTY IMAGE) OR THE INFER FUNCTION CRASHES!!
         # if self.ROI.any():
-        cv2.imwrite(os.path.join(vision_path, "segmentation/ROI_{}.png".format(self.ROI_number)), self.ROI)
+        try:
+            cv2.imwrite(os.path.join(vision_path, "segmentation/ROI_{}.png".format(self.ROI_number)), self.ROI)
+        except:
+            print("ROI is empty")
+            pass
 
     def position(self):
         PositionPub.print_coord(self)                          
@@ -130,10 +136,11 @@ class segmeasure():
       
         #re-opens as a PIL image the fragment ROI image
         # infim = Image.open("segmentation/ROI_{self.ROI_number}.png".format(self.ROI_number), self.ROI)
-        infim = Image.open(os.path.join(vision_path,"segmentation/ROI_{}.png".format(self.ROI_number)))
+        try:
+            infim = Image.open(os.path.join(vision_path,"segmentation/ROI_{}.png".format(self.ROI_number)))
         # cv2.imshow('ROI', infim)
         
-        if infim is not None:
+        # if infim is not None:
             #transforms the image into a tensor, unsqueezing dimension 0, and pases it to cuda()
             if torch.cuda.is_available():
                 infim = infer_transform(infim).unsqueeze(0).cuda()
@@ -164,7 +171,8 @@ class segmeasure():
 
             return self.confidence, self.prediction
         
-        else:
+        # else:
+        except:
             print("ROI is empty")
             pass  
         

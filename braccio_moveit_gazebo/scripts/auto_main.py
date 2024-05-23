@@ -74,10 +74,10 @@ def main():
             inference.write(ch_img + '\n')
 
         ch_img = "images/" + ch_img
+
     elif initial_choose == "c":
         camera.shoot()
         ch_img = "camera_image.jpg"
-
 
         inference_file = os.path.join(vision_path, "inference_(" + ch_img.replace('.jpg', '') + ").txt")
         print(inference_file)
@@ -130,8 +130,8 @@ def main():
         if angle < -45:
             angle = -(90 + angle)
         
-        # otherwise, just take the inverse of the angle to make
-        # it positive
+        # otherwise, just take the inverse of the angle to make it positive
+
         else:
             angle = -angle
         
