@@ -2,10 +2,10 @@
 
 import numpy as np
 
-import auto_targetter
+# import auto_targetter
 import measure_inference
 import image_listener
-import vision_utils
+# import vision_utils
 from custom_msgs.msg import target, matrix
 
 import open3d as o3d
@@ -45,7 +45,8 @@ from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import SpawnModel
 from sensor_msgs.msg import PointCloud2
 
-from custom_msgs import SherdPcl, SherdPclList
+from custom_msgs.msg import SherdPcl, SherdPclList
+from custom_msgs.msg import target, matrix
 from realsense.my_match_rgb_depth_pcl_class import RealSensePointCloud
 
 import time
@@ -85,9 +86,8 @@ def main():
 
     elif initial_choose == "c":
         ch_img = "color_frame.jpg"
-        ros_pcl = []
         rs_pc = RealSensePointCloud()
-        rs_pc.start_pipeline("./rosbag_walk/d435i_walk_around.bag")
+        rs_pc.start_pipeline("./realsense/rosbag_walk/d435i_walk_around.bag")
         only_color, color_frame, depth_frame = rs_pc.wait_for_frames()
         color_image = np.asanyarray(color_frame.get_data())
         precropped_verts = rs_pc.calculate_pointcloud(depth_frame)
@@ -95,6 +95,9 @@ def main():
                 
         only_color_image = np.asanyarray(only_color.get_data())
         rs_pc.save_color(only_color_image, ch_img)
+        
+        #CREATE A LIST WHICH WILL BE FILLED WITH PointCloud2 MESSAGES
+        pcl_list = []
 
         # camera.shoot()
         # ch_img = "camera_image.jpg"
@@ -223,7 +226,6 @@ def main():
 
         # RosPub.print_coord(segmentation.x_center, segmentation.y_center)
     
-
         if n > 0:
             segmentation.infer()
         
@@ -257,20 +259,21 @@ def main():
                      trbrX, trbrY, blbrX, blbrY, tlblX, tlblY, blX, blY, brX, brY,  nome)        
                 
             if initial_choose == "c":
+                #CREATE A CROPPED OPEN3D PCL, cropbox IS FROM 2D ROI IMAGE
                 cropped_color_image = realsense.crop_color_image(color_image, crop_box)
                 cropped_verts = rs_pc.verts_roi(precropped_verts, crop_box)
                 cropped_pcd = rs_pc.create_pointcloud(cropped_verts, cropped_color_image)
 
-                pcl_list = SherdPclList()
-        
+                #CREATE PointCloud2 MSG AND FILL IT WITH OPEN3D PCL
                 pc2_o3d = PointCloud2()
                 stamp = rospy.Time.now()
-                # print(stamp.secs)
-                # print(stamp.nsecs)
-                pc2_o3d.header.seq = n
+                print(n)
+                
                 # pc2_o3d.header.stamp = stamp
-                pc2_o3d = orh.o3dpc_to_rospc(cropped_pcd, "prova", stamp)
-                # ros_pcl.append(pc2_o3d)
+                pc2_o3d = orh.o3dpc_to_rospc(cropped_pcd, nome, stamp)
+                pc2_o3d.header.seq = n
+
+                #APPEND POINTCLOUD2 MSG TO SherdPclList MSG
                 pcl_list.append(pc2_o3d)
 
         segmentation.ROI_number += 1
@@ -308,7 +311,7 @@ def main():
     n = 0
 
     for i in range(len(group_stats)):
-        if group_stats[i,2].astype(float) > 0.30 and group_stats[i,3].astype(float) < 0.25: 
+        if group_stats[i,2].astype(float) > 0.30 and group_stats[i,3].astype(float) < 0.20: 
             variables[n,0] = group_stats[i,0]
             variables[n,1] = group_stats[i,1]
             # print(variables[n])
@@ -356,9 +359,11 @@ def main():
             # print(np.where([groups==posizioni[i,0]])[1])
             link_choose.append(lk)
                 
+    print(link_choose)
     # converting the list in a numpy array
     link_array = np.array(link_choose)
-    print(f"selected are {np.array2string(link_array)}")
+    print(f"selected are \n \
+          {np.array2string(link_array)}")
     # with open("../vision/inference.txt", 'a') as inference:
     with open(inference_file, 'a') as inference:
         inference.write("selected are \n" +  np.array2string(link_array) + '\n')
@@ -414,27 +419,48 @@ def main():
         #Appending the target message to the list
         target_msg_arr.append(target_msg)
     
-    # Converting the target_msg_arr list in a (custom) matrix_msg
-    matrix_msg = matrix()
-    matrix_msg.targets = target_msg_arr
-    print(matrix_msg)
-
     rate = rospy.Rate(10)
 
-    # creating the target_pub publisher, topic is /targets, message type is matrix
-    target_pub = rospy.Publisher('/targets', matrix, queue_size=10)
+    if initial_choose == "c":
+        pcl_msg = SherdPclList()
 
-    try:
-        # Publishing the matrix message with the targets
-        while not rospy.is_shutdown():
-            target_pub.publish(matrix_msg)
-            # rospy.spin()
-            rate.sleep()
+        for k in range(len(pcl_list)):
+            if (np.in1d(pcl_list[k].header.frame_id, link_array[:,3])):
+                pcl_msg.list.append(pcl_list[k])
+    
+        pcl_pub = rospy.Publisher('/sherd_pcl', SherdPclList, queue_size=10)
 
-    except KeyboardInterrupt:
-    # User interrupt the program with ctrl+c
-        print("Got Ctrl-c: closing subscriber and other processes")
-        exit()
+        try:
+            while not rospy.is_shutdown():
+                pcl_pub.publish(pcl_msg)
+                rate.sleep()
+
+        except KeyboardInterrupt:
+        # User interrupt the program with ctrl+c
+            print("Got Ctrl-c: closing subscriber and other processes")
+            exit()
+    
+    elif initial_choose == "i":
+    
+        # Converting the target_msg_arr list in a (custom) matrix_msg
+        matrix_msg = matrix()
+        matrix_msg.targets = target_msg_arr
+        print(matrix_msg)
+
+        # creating the target_pub publisher, topic is /targets, message type is matrix
+        target_pub = rospy.Publisher('/targets', matrix, queue_size=10)
+
+        try:
+            # Publishing the matrix message with the targets
+            while not rospy.is_shutdown():
+                target_pub.publish(matrix_msg)
+                # rospy.spin()
+                rate.sleep()
+
+        except KeyboardInterrupt:
+        # User interrupt the program with ctrl+c
+            print("Got Ctrl-c: closing subscriber and other processes")
+            exit()
         
 
 if __name__ == "__main__":

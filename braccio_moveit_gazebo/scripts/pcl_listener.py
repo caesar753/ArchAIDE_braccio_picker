@@ -1,49 +1,47 @@
 #!/usr/bin/env python3
 
-# from __future__ import print_function
-
-# import sys
 import rospy
-# import time
 
 from custom_msgs.msg import SherdPclList
-# from sensor_msgs.msg import PointCloud2
+
+import open3d as o3d
+from open3d_ros_helper import open3d_ros_helper as orh
 
 class Pcl_class(object):
 
     def __init__(self):
         self.pcl_list = SherdPclList()
-        self.i = 0
+        self.pcl_listen = rospy.Subscriber("/sherd_pcl", SherdPclList, self.pcl_callback)
+        rospy.sleep(1)
 
     def pcl_callback(self, msg):
-        # rospy.loginfo("Received PCL!")
+        rospy.loginfo("Received PCL!")
         try:           
-            for i in range(len(msg.list)):
-                # print(i)
-                self.pcl_list = msg
-                self.i = i
+            self.pcl_list = msg
         except: 
             print("Error occurred!")
 
-  #method to get the targets outside the pcl_callback method
+    #method to get the PCLs outside the callback method
     def return_pcls(self):
-        return(self.i, self.pcl_list)
-       
-    def pcl_listener(self):
-        rate = rospy.Rate(1)
-        pcl_listener = rospy.Subscriber("/SherdPcls", SherdPclList, self.pcl_callback)
-        rospy.loginfo("PCL received!")
+        
+        rate = rospy.Rate(1)        
+        self.pcl_listen
         rate.sleep()
-        pcl_listener.unregister()
+        self.pcl_listen.unregister()
+        
+        return(self.pcl_list)
 
+if __name__ == '__main__':
 
-# if __name__ == '__main__':
-
-#     pcl = Pcl_class()
+    pcl = Pcl_class()
     
-#     rospy.init_node('pcl_listener')
+    rospy.init_node('pcl_listener')
 
-#     pcl.pcl_listener()
-#     print(pcl.pcl_list[2])
-#     # lista2 = pcl.pcl_list
-#     # print(lista2[1])
+    pcl.return_pcls()
+    print(len(pcl.pcl_list.list))
+    for i in (range(len(pcl.pcl_list.list))):
+        pointcl = pcl.pcl_list.list[i]
+        rospy.loginfo("PCL name: " + str(pointcl.header.frame_id))
+
+        open_3d_pcl = orh.rospc_to_o3dpc(pointcl)
+        o3d.visualization.draw_geometries([open_3d_pcl])
