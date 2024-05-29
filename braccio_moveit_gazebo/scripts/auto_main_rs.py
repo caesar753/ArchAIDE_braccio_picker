@@ -91,7 +91,6 @@ def main():
         only_color, color_frame, depth_frame = rs_pc.wait_for_frames()
         color_image = np.asanyarray(color_frame.get_data())
         precropped_verts = rs_pc.calculate_pointcloud(depth_frame)
-        precropped_verts_sh = precropped_verts.reshape(-1,3)
                 
         only_color_image = np.asanyarray(only_color.get_data())
         rs_pc.save_color(only_color_image, ch_img)
@@ -267,9 +266,7 @@ def main():
                 #CREATE PointCloud2 MSG AND FILL IT WITH OPEN3D PCL
                 pc2_o3d = PointCloud2()
                 stamp = rospy.Time.now()
-                print(n)
-                
-                # pc2_o3d.header.stamp = stamp
+
                 pc2_o3d = orh.o3dpc_to_rospc(cropped_pcd, nome, stamp)
                 pc2_o3d.header.seq = n
 
@@ -367,25 +364,6 @@ def main():
     # with open("../vision/inference.txt", 'a') as inference:
     with open(inference_file, 'a') as inference:
         inference.write("selected are \n" +  np.array2string(link_array) + '\n')
-
-    ###POINTCLOUD SEGMENTATION - START ###
-    # print("starting pointcloud segmentation")
-    # debug = True
-    # pcd = vision_utils.get_point_cloud_from_ros(debug)
-
-    # print ('Table Segmentation')
-    # table_cloud, object_cloud = vision_utils.segment_table(pcd)
-
-    # voxel_pc = object_cloud.voxel_down_sample(voxel_size=0.001)
-
-    # object_cloud, ind = voxel_pc.remove_radius_outlier(nb_points=40, radius=0.005)
-    # object_cloud.paint_uniform_color([0, 1, 0])
-    # table_cloud.paint_uniform_color([1, 0, 0])
-
-    # if debug:
-    #     o3d.visualization.draw_geometries([table_cloud, object_cloud])
-    ###POINTCLOUD SEGMENTATION - END ###
-
     
     #HERE WE USE CUSTOM TARGET AND MATRIX MESSAGES
     # List with the target messages
@@ -428,7 +406,7 @@ def main():
             if (np.in1d(pcl_list[k].header.frame_id, link_array[:,3])):
                 pcl_msg.list.append(pcl_list[k])
     
-        pcl_pub = rospy.Publisher('/sherd_pcl', SherdPclList, queue_size=10)
+        pcl_pub = rospy.Publisher('/SherdPcls', SherdPclList, queue_size=10)
 
         try:
             while not rospy.is_shutdown():

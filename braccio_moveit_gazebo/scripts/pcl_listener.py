@@ -11,8 +11,7 @@ class Pcl_class(object):
 
     def __init__(self):
         self.pcl_list = SherdPclList()
-        self.pcl_listen = rospy.Subscriber("/sherd_pcl", SherdPclList, self.pcl_callback)
-        rospy.sleep(1)
+        self.pcl_listen = rospy.Subscriber("/SherdPcls", SherdPclList, self.pcl_callback)
 
     def pcl_callback(self, msg):
         rospy.loginfo("Received PCL!")

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import numpy as np                        # fundamental package for scientific computing
-import matplotlib.pyplot as plt           # 2D plotting library producing publication quality figures
+# import matplotlib.pyplot as plt           # 2D plotting library producing publication quality figures
 from matplotlib import pylab
 import open3d.visualization
 import pyrealsense2 as rs                 # Intel RealSense cross-platform open-source API
 
 import open3d
+import cv2 as cv2
 
 
 # print("Environment Ready")
@@ -38,12 +39,11 @@ class RealSensePointCloud:
 
     def save_color (self, color, filename):
         # color_image = np.asanyarray(color_frame.get_dat/a())
-        plt.rcParams["axes.grid"] = False
-        plt.rcParams['figure.figsize'] = [12, 6]
-        plt.figure(num='Only color frame')
-        plt.imshow(color)
-        plt.savefig(filename)
-        plt.close()
+
+        cv2.imwrite(filename, color)
+        cv2.imshow('Color image', color)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def calculate_pointcloud(self, depth_frame):
         points = self.pc.calculate(depth_frame)
@@ -60,11 +60,9 @@ class RealSensePointCloud:
         image = image[crop_box[2]:crop_box[3], crop_box[0]:crop_box[1]]
         print(image.shape)
 
-        plt.rcParams["axes.grid"] = False
-        plt.rcParams['figure.figsize'] = [12, 6]
-        plt.figure(num='Color aligned with depth')
-        plt.imshow(image)
-        plt.show()
+        # cv2.imshow('Cropped color image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         return image
 
@@ -72,7 +70,7 @@ class RealSensePointCloud:
         color_image = color_image.reshape(-1,3)
         pcd = open3d.geometry.PointCloud()
         pcd.points = open3d.utility.Vector3dVector(verts.astype(np.float32) / 255)
-        pcd.colors = open3d.utility.Vector3dVector(color_image.astype(np.float32) / 255)
+        # pcd.colors = open3d.utility.Vector3dVector(color_image.astype(np.float32) / 255)
         return pcd
 
 # #Example usage:

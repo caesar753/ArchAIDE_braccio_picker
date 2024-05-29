@@ -29,6 +29,7 @@ def main():
     open3d.visualization.draw_geometries([cropped_pcd])
 
     rs_pc.save_color(only_color_image, 'color_frame.png')
+    rs_pc.save_color(color_image, 'color_depth_frame.png')
     rs_pc.save_color(cropped_only_color, 'cropped_color_frame.png')
 
 if __name__ == "__main__":
