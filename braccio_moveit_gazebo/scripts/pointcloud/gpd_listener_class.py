@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import rospy
+import tf
 
 # from custom_msgs.msg import SherdPclList
-from gpd_ros.msg import GraspConfig
+from gpd_ros.msg import GraspConfigList
 
 # import open3d as o3d
 # from open3d_ros_helper import open3d_ros_helper as orh
@@ -11,8 +12,8 @@ from gpd_ros.msg import GraspConfig
 class gpd_class(object):
 
     def __init__(self):
-        self.grasp = GraspConfig()
-        self.gpd_listen = rospy.Subscriber("/detect_grasps/clustered_grasps", GraspConfig, self.pcl_callback)
+        self.grasp = GraspConfigList()
+        self.gpd_listen = rospy.Subscriber("/detect_grasps/clustered_grasps", GraspConfigList, self.pcl_callback)
 
     def pcl_callback(self, msg):
         rospy.loginfo("Grasp Pose detected!")
@@ -23,12 +24,7 @@ class gpd_class(object):
 
     #method to get the PCLs outside the callback method
     def return_grasp(self):
-        
-                
         self.gpd_listen
-        # rate.sleep()
-        # self.gpd_listen.unregister()
-        print(self.grasp)
         
         return(self.grasp)
 
@@ -39,18 +35,10 @@ if __name__ == '__main__':
     
     rospy.init_node('gpd_listener')
     
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(0.1)
 
     while not rospy.is_shutdown():
         gpd.return_grasp()
+        print(gpd.grasp)
         rate.sleep()
-    # print(gpd.grasp)
-
-    # pcl.return_pcls()
-    # print(len(pcl.pcl_list.list))
-    # for i in (range(len(pcl.pcl_list.list))):
-    #     pointcl = pcl.pcl_list.list[i]
-    #     rospy.loginfo("PCL name: " + str(pointcl.header.frame_id))
-
-    #     open_3d_pcl = orh.rospc_to_o3dpc(pointcl)
-    #     o3d.visualization.draw_geometries([open_3d_pcl])
+    
