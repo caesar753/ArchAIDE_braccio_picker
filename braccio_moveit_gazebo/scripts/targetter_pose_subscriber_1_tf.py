@@ -8,6 +8,7 @@ import auto_targetter
 import pose_goal_targetter
 
 import vision_utils
+import os
 
 
 if __name__ == '__main__':
@@ -18,7 +19,13 @@ if __name__ == '__main__':
     targetter = auto_targetter.BraccioObjectTargetInterface(rospy)
     pose_targetter = pose_goal_targetter.BraccioPoseGoal(rospy)
 
-    targetter.load_calibrate()
+
+    if os.path.exists("calibration.json"):
+        targetter.load_calibrate()
+    else:
+        targetter.calibrate()
+        targetter.load_calibrate()
+
 
     rate = rospy.Rate(100)
 
