@@ -4,7 +4,7 @@
   <arg name="connect_braccio" default="false" />
   <arg name="robot_name" default="kuka" />
   <arg name="use_ros_control" default="False" />
-  <arg name="use_rviz" default="False" />
+  <arg name="use_rviz" default="True" />
   <arg name="rd" default="robot_description" />
 
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
