@@ -238,7 +238,7 @@ class segmeasure():
         mesh_dim = sherd_class.replace("1 1", new_dim_mesh)
         mesh_rot = mesh_dim.replace("yaw", str(rot_angle))
 
-        created = open("models/model_{}.sdf".format(n),'w+')
+        created = open("../models/model_{}.sdf".format(n),'w+')
         created.write(mesh_rot)
         created.close()
 
@@ -271,7 +271,7 @@ class PositionPub():
         initial_pose.orientation.w = 1.0
 
         # f = open('/home/benb/Dropbox/RoboticsResearch/WAMInProgress/tp/AllInOne/Trajectory_Phonebook/ros_stuff/src/iiim_wam_description/wam.sdf','r')
-        f = open("models/model_{}.sdf".format(n), 'r')
+        f = open("../models/model_{}.sdf".format(n), 'r')
         sdff = f.read()
 
         rospy.wait_for_service('/gazebo/spawn_sdf_model')
