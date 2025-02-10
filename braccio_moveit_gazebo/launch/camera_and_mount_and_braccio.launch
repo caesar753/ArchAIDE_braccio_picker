@@ -28,6 +28,7 @@
   <include file="$(find braccio_description)/launch/kr5.1_upload.launch">
      <arg name="robot_name" value="$(arg robot_name)" />
      <arg name="use_ros_control" value="$(arg use_ros_control)" />
+     <!-- <arg name="use_sim_time" value="true" /> -->
   </include>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->

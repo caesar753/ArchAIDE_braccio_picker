@@ -4,6 +4,8 @@
 <arg name="robot_name" default="kuka" />
 <arg name="use_ros_control" default="True" />
 <arg name="motors_controller_type" default="EffortJointInterface" />
+<arg name="use_sim_time" default="True" />
+
 
 <!-- Load robot description to parameter server -->
 
