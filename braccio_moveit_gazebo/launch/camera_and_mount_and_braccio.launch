@@ -6,6 +6,8 @@
   <arg name="use_ros_control" default="False" />
   <arg name="use_rviz" default="True" />
   <arg name="rd" default="robot_description" />
+  <arg name="camera" value="realsense"/>
+
 
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="paused" default="false"/>
@@ -28,6 +30,7 @@
   <include file="$(find braccio_description)/launch/kr5.1_upload.launch">
      <arg name="robot_name" value="$(arg robot_name)" />
      <arg name="use_ros_control" value="$(arg use_ros_control)" />
+      <arg name="camera" value="$(arg camera)" />
   </include>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
@@ -48,6 +51,18 @@
 
   <include if="$(arg connect_braccio)" file="$(find braccio_moveit_gazebo)/launch/connect.launch">
   </include>
+
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="camera" value="$(arg camera)"/>
+    <arg name="filters" value="pointcloud" />
+    <arg name="initial_reset" value="true" />
+    <arg name="align_depth" value="true" />
+    <arg name="tf_prefix" value="$(arg camera)" />
+    <arg name="allow_no_texture_points" value="true"/>
+  </include>
+
+  <!-- <node  name="tf_camera_rotation" pkg="tf" type="static_transform_publisher" args="0 0 0.5 -0.75 0 -2.55   world realsense_depth_optical_frame 50"/> -->
+
 
 
 </launch>

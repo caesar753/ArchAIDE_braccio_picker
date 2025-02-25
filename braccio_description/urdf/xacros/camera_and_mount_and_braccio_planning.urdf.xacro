@@ -1,18 +1,23 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="kr5">
+
+    <xacro:arg name="camera_name" default="realsense"/>
+    <!-- <xacro:property name="topolino" value="cazzo"/> -->
+    <!-- <xacro:property name="pippo" value="$(arg camera)"/> -->
+
     
     <xacro:include filename="$(find braccio_description)/urdf/xacros/camera_mount_model.urdf.xacro" />
-
-    <xacro:include filename="$(find braccio_description)/urdf/xacros/_d435.urdf.xacro"/>
+    <!-- <xacro:include filename="$(find braccio_description)/urdf/xacros/_d435.urdf.xacro"/> -->
+    <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
     <xacro:include filename="$(find braccio_description)/urdf/xacros/braccio_model_planning.urdf.xacro"/>
-
-
+    
     <link name="world"/>
 
     <xacro:camera_mount parent="world">
     </xacro:camera_mount>
 
-    <xacro:sensor_d435 parent="mount">
+    <xacro:sensor_d435 parent="mount"  name="$(arg camera_name)">
+    <!-- <xacro:sensor_d435 parent="mount"  name="${pippo}"> -->
         <!-- <origin xyz="0.05 0.015 0.59" rpy="-0.12 1.15 0.780" /> -->
         <origin xyz="0.05 0.015 0.59" rpy="-0.12 1.00 0.78" />
     </xacro:sensor_d435>
