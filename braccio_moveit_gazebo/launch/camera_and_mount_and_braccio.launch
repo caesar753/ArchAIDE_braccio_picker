@@ -53,12 +53,18 @@
   </include>
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="device_type" value="d435(?!i)"/>
     <arg name="camera" value="$(arg camera)"/>
+    <arg name="tf_prefix" value="$(arg camera)" />
+
     <arg name="filters" value="pointcloud" />
     <arg name="initial_reset" value="true" />
-    <arg name="align_depth" value="true" />
-    <arg name="tf_prefix" value="$(arg camera)" />
+    <arg name="enable_pointcloud" value="true"/>
+    <arg name="ordered_pc" value="true"/>
     <arg name="allow_no_texture_points" value="true"/>
+    
+    <!-- <arg name="enable_sync" value="true"/> -->
+    <!-- <arg name="align_depth" value="true"/> -->
   </include>
 
   <!-- <node  name="tf_camera_rotation" pkg="tf" type="static_transform_publisher" args="0 0 0.5 -0.75 0 -2.55   world realsense_depth_optical_frame 50"/> -->
