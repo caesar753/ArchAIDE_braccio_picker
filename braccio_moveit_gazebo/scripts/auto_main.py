@@ -213,13 +213,14 @@ def main():
             class_sherd = ("class" + lab)
             x_mm = repr(round(centX,2))
             y_mm = repr(round(centY,2))
+            angle = repr(round(angle,4))
             nome = ("sherd_" + str(n))
             # dim_x = repr(round(dimA,2))
             # dim_y = repr(round(dimB,2))
             dim_med_str = repr(round(dim_med,2))
             position_mm.write(lab + " " + conf + " " + x_mm + " " + y_mm + " " + nome + " " + \
                 # dim_x + " " + dim_y + "\n")
-                dim_med_str + "\n")
+                dim_med_str + " " + angle +"\n")
             position_mm.close()
             
             # segmentation.add_link(x_mm, y_mm)
@@ -267,7 +268,7 @@ def main():
     n = 0
 
     for i in range(len(group_stats)):
-        if group_stats[i,2].astype(float) > 0.30 and group_stats[i,3].astype(float) < 0.25: 
+        if group_stats[i,2].astype(float) > 0.30 and group_stats[i,3].astype(float) < 0.30: 
             variables[n,0] = group_stats[i,0]
             variables[n,1] = group_stats[i,1]
             # print(variables[n])
@@ -309,7 +310,8 @@ def main():
                     posizioni[i, 3].astype(float), 
                     posizioni[i,4], 
                     # posizioni[i,5] if posizioni[i,5] >= posizioni[i,6] else posizioni[i,6], 
-                    posizioni[i,5],
+                    posizioni[i,5].astype(float),
+                    posizioni[i,6],
                     np.array2string(np.where([groups==posizioni[i,0]])[1]))
             # print(lk)
             # print(np.where([groups==posizioni[i,0]])[1])
@@ -359,7 +361,10 @@ def main():
         cent_y = link_array[j,2].astype(float)
         target_msg.center = [cent_x, cent_y]
         
-        bowl_ch = link_array[j,5].astype(str)
+        #20261126: add angle to target_msg
+        target_msg.angle = link_array[j,5].astype(float)
+        
+        bowl_ch = link_array[j,6].astype(str)
         bowl_ch = bowl_ch.replace('\'','').replace('\'','')
         bowl_ch = bowl_ch.replace('[','').replace(']','')
         bowl_ch = "go_to_home_" + bowl_ch
