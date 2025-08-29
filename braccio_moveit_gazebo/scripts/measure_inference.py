@@ -45,6 +45,9 @@ infer_transform = transforms.Compose([
 
 vision_path = "../vision/"
 
+if not os.path.exists(vision_path):
+    os.makedirs(vision_path)
+
 
 class segmeasure():
     def __init__(self, img, ld_model, inference_file, method = "bottom-to-top", wdt = 100):

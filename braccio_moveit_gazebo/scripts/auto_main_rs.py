@@ -63,6 +63,9 @@ realsense = RealSensePointCloud()
 
 vision_path = "../vision/"
 
+if not os.path.exists(vision_path):
+    os.makedirs(vision_path)
+
 def main():
     rospy.init_node('auto_main')
 
@@ -318,14 +321,14 @@ def main():
     # print(variables)
     variables = variables[variables[:,1].argsort()[::-1]]
     # print(variables)
-    choosen = variables[:3]
-    choosen = np.array2string(choosen)
-    choosen = choosen.replace('[','').replace(']','').replace('\'','')   
-    print(choosen)
+    chosen = variables[:3]
+    chosen = np.array2string(chosen)
+    chosen = chosen.replace('[','').replace(']','').replace('\'','')   
+    print(chosen)
 
     
-    choose = open (os.path.join(vision_path,"choosen.txt"), "w+")
-    choose.write (choosen)
+    choose = open (os.path.join(vision_path,"chosen.txt"), "w+")
+    choose.write (chosen)
     choose.close()
 
     #creating an array of the sherds on the table with (class, conf_lev, (x,y)_cent, link_name)
@@ -333,16 +336,16 @@ def main():
         posizioni = np.array([[x for x in line.split()] for line in pos])
         print(posizioni)
 
-    choosen_file = os.path.join(vision_path, "choosen.txt")
+    chosen_file = os.path.join(vision_path, "chosen.txt")
     # os.chdir(vision_path)
-    with open (choosen_file) as g:
+    with open (chosen_file) as g:
         groups = np.array([[x for x in line.split()] for line in g])
         groups = groups[:,0]
 
     link_choose = []
 
     print(groups)
-    #creating a list with the choosen link name
+    #creating a list with the chosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)):# and posizioni[i,1].astype(float) >= 0.35: 
             lk = (posizioni[i, 0].astype(int), 

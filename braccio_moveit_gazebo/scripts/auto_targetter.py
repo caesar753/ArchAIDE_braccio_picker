@@ -486,13 +486,13 @@ class BraccioObjectTargetInterface(object):
     self.go_to_j(j0=1.5708,j1=1.5708,j2=1.5708,j3=1.5708)
 
   def linkch(self):
-    with open ("choosen.txt") as g:
+    with open ("chosen.txt") as g:
       groups = np.array([[x for x in line.split()] for line in g])
     #creating an array of the sherds on the table with (class, conf_lev, (x,y)_cent, link_name)
     with open ("posizioni_mm.txt") as pos:
         posizioni = np.array([[x for x in line.split()] for line in pos])
     link_choose = []
-    #creating a list with the choosen link name
+    #creating a list with the chosen link name
     for i in range(len(posizioni)):
         if (np.in1d(posizioni[i,0], groups)): 
             # print(posizioni[i]) 
